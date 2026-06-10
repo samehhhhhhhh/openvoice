@@ -1,6 +1,17 @@
 add_rules("mode.debug", "mode.release")
+add_requires("miniaudio")
+
+target("miniaudio")
+    set_kind("static")
+    add_files("thirdparty/miniaudio.c")
 
 target("openvoice")
+    
+    after_build(function (target)
+        os.cp("audio.wav", target:targetdir())
+    end)
+    add_deps("miniaudio")
+    add_includedirs("thirdparty", {public = true})
     set_kind("binary")
     add_files("src/*.cpp")
 
