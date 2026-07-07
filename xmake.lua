@@ -1,5 +1,6 @@
 add_rules("mode.debug", "mode.release")
-add_requires("miniaudio")
+add_requires("imgui", {configs = {glfw_opengl3 = true}})
+add_requires("opengl", "glfw")
 
 target("miniaudio")
     set_kind("static")
@@ -10,10 +11,11 @@ target("openvoice")
     after_build(function (target)
         os.cp("audio.wav", target:targetdir())
     end)
+    add_packages("imgui", "glfw", "opengl")
     add_deps("miniaudio")
     add_includedirs("thirdparty", {public = true})
     set_kind("binary")
-    add_files("src/*.cpp")
+    add_files("src/**.cpp")
 
 --
 -- If you want to known more usage about xmake, please see https://xmake.io
