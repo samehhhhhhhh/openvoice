@@ -16,12 +16,14 @@
 #endif
 
 #include <GLFW/glfw3.h>
-
+#include "../audio_engine/engine.hpp"
 class App
 {
 public:
     App();
     ~App();
+
+    engine audio_engine;
 
     void run();
 

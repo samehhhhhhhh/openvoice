@@ -133,6 +133,11 @@ void App::run()
                 1000.0f / io.Framerate,
                 io.Framerate);
 
+            if (ImGui::Button("Play sound")) {
+                audio_engine.play("audio.wav");
+            }
+
+
             ImGui::End();
         }
 

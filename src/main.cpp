@@ -7,8 +7,5 @@ int main()
 {
     App my_app;
     my_app.run();
-    engine my_engine;
-    std::string filename = "audio.wav";
-    my_engine.play(filename);
 
 }
