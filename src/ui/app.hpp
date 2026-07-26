@@ -1,6 +1,4 @@
-//
-// Created by samehh on 6/7/2026.
-//
+
 
 #ifndef OPENVOICE_APP_H
 #define OPENVOICE_APP_H
@@ -33,7 +31,7 @@ private:
     GLFWwindow* window = nullptr;
     const char* glslVersion = nullptr;
 
-    bool showDemoWindow = true;
+
     bool showAnotherWindow = false;
     ImVec4 clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 };

@@ -1,6 +1,4 @@
-//
-// Created by samehh on 6‏/7‏/2026.
-//
+
 
 #include "app.hpp"
 
@@ -118,28 +116,47 @@ void App::run()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        if (showDemoWindow)
-            ImGui::ShowDemoWindow(&showDemoWindow);
-
-        {
-
-            ImGui::Begin("Openvoice");
-
-            ImGui::Text("Welcome to openvoice");
-            ImGui::Checkbox("Demo Window", &showDemoWindow);
-
-            ImGui::Text(
-                "Application average %.3f ms/frame (%.1f FPS)",
-                1000.0f / io.Framerate,
-                io.Framerate);
-
-            if (ImGui::Button("Play sound")) {
-                audio_engine.play("audio.wav");
-            }
+        #ifdef IMGUI_HAS_VIEWPORT
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->GetWorkPos());
+        ImGui::SetNextWindowSize(viewport->GetWorkSize());
+        ImGui::SetNextWindowViewport(viewport->ID);
+        #else
+        ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
+        ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+        #endif
 
 
-            ImGui::End();
+
+        ImGui::Begin("Openvoice", nullptr, ImGuiWindowFlags_NoDecoration);
+
+        // make a navbar here with the project name, a + button to create a voice and that gets you in the node editor
+        // Also a search bar to search locally for voices.
+
+        ImGui::Text("Welcome to openvoice");
+
+
+        ImGui::Text(
+            "Application average %.3f ms/frame (%.1f FPS)",
+            1000.0f / io.Framerate,
+            io.Framerate);
+
+
+        if (ImGui::Button("Play sound")) {
+            audio_engine.play("audio.wav");
         }
+
+        // Display all locally saved voice files.
+        // Make a card for every sound.
+
+
+
+
+
+
+        ImGui::End();
+
+
 
         ImGui::Render();
 

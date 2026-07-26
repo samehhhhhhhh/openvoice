@@ -1,7 +1,9 @@
 
 #include "engine.hpp"
 
-void engine::play(std::string filename) {
+#include <cstring>
+
+void engine::play(const std::string& filename) {
     result = ma_sound_init_from_file(&audio_engine, filename.c_str(), 0, NULL, NULL, &sound);
 
     check_errors(result, "Failed to init from file.");
@@ -11,3 +13,21 @@ void engine::play(std::string filename) {
     ma_sound_start(&sound);
 
 }
+
+ma_result engine::check_errors(const ma_result &result, const std::string &msg) {
+    if (result != MA_SUCCESS) {
+        std::cout << msg << std::endl;
+        return result;
+    }
+}
+
+void engine::data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
+    if (pDevice->capture.format != pDevice->playback.format || pDevice->capture.channels != pDevice->playback.channels) {
+        return;
+    }
+
+
+    std::memcpy(pOutput, pInput, frameCount * ma_get_bytes_per_frame(pDevice->capture.format, pDevice->capture.channels));
+}
+
+
