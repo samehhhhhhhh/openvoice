@@ -1,12 +1,7 @@
-
-
 #ifndef OPENVOICE_ENGINE_H
 #define OPENVOICE_ENGINE_H
 #include "../shared/includes.hpp"
-
 #include <miniaudio.h>
-
-
 
 class engine {
 
@@ -25,11 +20,13 @@ public :
 
     ma_device_config device_config;
     ma_device device;
+
 // implement function that streams audio from input to ouput
 
     bool stream_microphone = false;
 
     engine() {
+
         device_config = ma_device_config_init(ma_device_type_duplex);
         device_config.capture.pDeviceID  = NULL;
         device_config.capture.format     = ma_format_s16;
@@ -45,8 +42,6 @@ public :
         }
         ma_device_start(&device);
 
-
-
         config = ma_resource_manager_config_init();
         result =  ma_resource_manager_init(&config, &resourceManager);
 
@@ -58,12 +53,13 @@ public :
         engineConfig = ma_engine_config_init();
 
         result = ma_engine_init(&engineConfig, &audio_engine);
+
         check_errors(result, "Initialize the engine");
 
     };
 
-    void play(const std::string& filename);
-
+    void play();
+    void load_sound(const std::string& filename);
 
     // Destructor
     ~engine() {
