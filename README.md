@@ -12,7 +12,7 @@ without requiring paid subscriptions like voicemod.
 
 // Wiki
 
-All voices are represented by a node graph. 
+All voices are represented by a node graph. -> Look for https://github.com/thedmd/imgui-node-editor
 There is an input node that represents the audio input, it will then get processed through multiple effects
 and then be outputted through an output node. This can be compared to the FL Studio Patcher. 
 
@@ -22,9 +22,9 @@ installed on the client. Thus, the user can either acquire his own configuration
 
 Roadmap : 
 
-- Show a window that contains a button that streams your microphone to your default output device. 
-- Make an audio engine class. 
-- Make a node editor 
+- Show a window that contains a button that streams your microphone to your default output device. -- Done
+- Make an audio engine class. -- Done
+- Make a node editor -- Doing that now!
 - Make the connection between the node editor and the audio engine. 
 - Implement configuration saving.
 - Make different windows (Just homepage and node editor at least)

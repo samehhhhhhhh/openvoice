@@ -1,42 +1,12 @@
-//
-// Created by samehh on 6‏/7‏/2026.
-//
 
 #include "app.hpp"
 
-#include <cstdio>
+App::App() {
+    std::cout << "HEY";
 
-#ifdef __EMSCRIPTEN__
-#include "../libs/emscripten/emscripten_mainloop_stub.h"
-#endif
-
-void App::glfwErrorCallback(int error, const char* description)
-{
-    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
-}
-
-App::App()
-{
-    glfwSetErrorCallback(glfwErrorCallback);
     glfwInit();
 
-#if defined(IMGUI_IMPL_OPENGL_ES2)
-
-    glslVersion = "#version 100";
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-
-#elif defined(IMGUI_IMPL_OPENGL_ES3)
-
-    glslVersion = "#version 300 es";
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-
-#elif defined(__APPLE__)
+#if defined(__APPLE__)
 
     glslVersion = "#version 150";
 
@@ -54,7 +24,7 @@ App::App()
 
 #endif
 
-    float mainScale =
+    const float mainScale =
         ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor());
 
     window = glfwCreateWindow(
@@ -85,6 +55,7 @@ App::App()
     ImGui_ImplOpenGL3_Init(glslVersion);
 }
 
+
 App::~App()
 {
     ImGui_ImplOpenGL3_Shutdown();
@@ -95,16 +66,53 @@ App::~App()
     glfwTerminate();
 }
 
+void App::renderHomePage() {
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::Begin("Openvoice", nullptr, ImGuiWindowFlags_NoDecoration);
+
+    ImGui::Text("Welcome to openvoice");
+
+
+    ImGui::Text(
+        "Application average %.3f ms/frame (%.1f FPS)",
+        1000.0f / io.Framerate,
+        io.Framerate);
+
+    if (ImGui::Button("Load sound")) {
+        audio_engine.load_sound("audio.wav");
+    }
+    if (ImGui::Button("Play sound")) {
+        audio_engine.play();
+    }
+
+    if (ImGui::Button("Open Node editor")) {
+        nodeEditorOpen = true;
+    }
+
+    // Display all locally saved voice files.
+    // Make a card for every sound.
+
+    ImGui::End();
+
+}
+
+void App::renderNodeEditor() {
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::Begin("Node editor", nullptr, ImGuiWindowFlags_NoDecoration);
+
+    ImGui::Text("This is the node editor");
+
+    if (ImGui::Button("Return")) {
+        nodeEditorOpen = false;
+    }
+    ImGui::End();
+
+}
+
 void App::run()
 {
-    ImGuiIO& io = ImGui::GetIO();
 
-#ifdef __EMSCRIPTEN__
-    io.IniFilename = nullptr;
-    EMSCRIPTEN_MAINLOOP_BEGIN
-#else
     while (!glfwWindowShouldClose(window))
-#endif
     {
         glfwPollEvents();
 
@@ -118,23 +126,24 @@ void App::run()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        if (showDemoWindow)
-            ImGui::ShowDemoWindow(&showDemoWindow);
+        #ifdef IMGUI_HAS_VIEWPORT
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->GetWorkPos());
+        ImGui::SetNextWindowSize(viewport->GetWorkSize());
+        ImGui::SetNextWindowViewport(viewport->ID);
+        #else
+        ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
+        ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+        #endif
 
-        {
-
-            ImGui::Begin("Openvoice");
-
-            ImGui::Text("Welcome to openvoice");
-            ImGui::Checkbox("Demo Window", &showDemoWindow);
-
-            ImGui::Text(
-                "Application average %.3f ms/frame (%.1f FPS)",
-                1000.0f / io.Framerate,
-                io.Framerate);
-
-            ImGui::End();
+        // make a navbar here with the project name, a + button to create a voice and that gets you in the node editor
+        // Also a search bar to search locally for voices.
+        if (nodeEditorOpen) {
+            renderNodeEditor();
+        } else {
+            renderHomePage();
         }
+
 
         ImGui::Render();
 
@@ -156,8 +165,5 @@ void App::run()
         glfwSwapBuffers(window);
     }
 
-#ifdef __EMSCRIPTEN__
-    EMSCRIPTEN_MAINLOOP_END;
-#endif
 }
 
