@@ -23,10 +23,10 @@ installed on the client. Thus, the user can either acquire his own configuration
 Roadmap : 
 
 - Show a window that contains a button that streams your microphone to your default output device. -- Done
+- Make different windows (Just homepage and node editor at least) -- Done !
 - Make an audio engine class. -- Done
 - Make a node editor -- Doing that now!
 - Make the connection between the node editor and the audio engine. 
 - Implement configuration saving.
-- Make different windows (Just homepage and node editor at least)
 - Work on the configuration database.
 
