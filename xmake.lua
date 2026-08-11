@@ -17,8 +17,10 @@ target("openvoice")
 
 -- Adding files to compilation
     add_includedirs("thirdparty", {public = true})
+    add_includedirs("thirdparty/imgui-node-editor", {public = true})
     add_includedirs("src")
     add_files("thirdparty/miniaudio.c")
+    add_files("thirdparty/imgui-node-editor/**.cpp")
     add_files("src/**.cpp")
 
     set_kind("binary")

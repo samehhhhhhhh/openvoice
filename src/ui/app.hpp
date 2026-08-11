@@ -9,6 +9,8 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
+
+#include "node_editor_manager.hpp"
 class App
 {
 public:
@@ -16,6 +18,7 @@ public:
     ~App();
 
     engine audio_engine;
+    node_editor_manager n_manager;
 
     void run();
 
@@ -24,6 +27,7 @@ private:
     // variables :
     GLFWwindow* window = nullptr;
     const char* glslVersion = nullptr;
+
 
     bool nodeEditorOpen = false;
     bool showAnotherWindow = false;

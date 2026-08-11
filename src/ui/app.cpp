@@ -105,12 +105,16 @@ void App::renderNodeEditor() {
     if (ImGui::Button("Return")) {
         nodeEditorOpen = false;
     }
+
+    // Use the node_editor_manager class here
+
     ImGui::End();
 
 }
 
 void App::run()
 {
+
 
     while (!glfwWindowShouldClose(window))
     {

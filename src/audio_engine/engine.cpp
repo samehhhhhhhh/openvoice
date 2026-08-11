@@ -26,6 +26,7 @@ ma_result engine::check_errors(const ma_result &result, const std::string &msg) 
     return result;
 
 }
+#include <cstring>
 
 void engine::data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
     if (pDevice->capture.format != pDevice->playback.format || pDevice->capture.channels != pDevice->playback.channels) {
@@ -33,7 +34,7 @@ void engine::data_callback(ma_device* pDevice, void* pOutput, const void* pInput
     }
 
 // Change to C++ version
-    std::memcpy(pOutput, pInput, frameCount * ma_get_bytes_per_frame(pDevice->capture.format, pDevice->capture.channels));
+    memcpy(pOutput, pInput, frameCount * ma_get_bytes_per_frame(pDevice->capture.format, pDevice->capture.channels));
 }
 
 
