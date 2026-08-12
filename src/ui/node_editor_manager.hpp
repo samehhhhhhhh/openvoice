@@ -9,16 +9,16 @@
 #include <imgui_node_editor.h>
 
 namespace ed = ax::NodeEditor;
-class node_editor_manager {
+class node_editor_man {
 
     ed::EditorContext* m_Context = nullptr;
-
-    node_editor_manager() {
+public:
+    node_editor_man() {
         ed::Config config;
         config.SettingsFile = "Simple.json";
         m_Context = ed::CreateEditor(&config);
     }
-    ~node_editor_manager() {
+    ~node_editor_man() {
         ed::DestroyEditor(m_Context);
     }
 

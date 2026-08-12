@@ -1,4 +1,3 @@
-
 #include "engine.hpp"
 
 void engine::play() {
@@ -6,7 +5,6 @@ void engine::play() {
     std::cout << "Playing sound " << std::endl;
 
     ma_sound_start(&sound);
-
 }
 
 void engine::load_sound(const std::string &filename) {
@@ -28,8 +26,11 @@ ma_result engine::check_errors(const ma_result &result, const std::string &msg) 
 }
 #include <cstring>
 
-void engine::data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
-    if (pDevice->capture.format != pDevice->playback.format || pDevice->capture.channels != pDevice->playback.channels) {
+void engine::data_callback(ma_device* pDevice, void* pOutput, const void* pInput, const ma_uint32 frameCount) {
+
+    auto* self = static_cast<engine*>(pDevice->pUserData);
+
+    if (pDevice->capture.format != pDevice->playback.format || pDevice->capture.channels != pDevice->playback.channels || self->stream_microphone == false) {
         return;
     }
 

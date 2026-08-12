@@ -18,7 +18,7 @@ public:
     ~App();
 
     engine audio_engine;
-    node_editor_manager n_manager;
+    node_editor_man n_manager;
 
     void run();
 

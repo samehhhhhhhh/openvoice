@@ -4,7 +4,7 @@
 
 #include "node_editor_manager.hpp"
 
-void node_editor_manager::OnFrame(float deltaTime) {
+void node_editor_man::OnFrame(float deltaTime) {
     auto& io = ImGui::GetIO();
 
     ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);

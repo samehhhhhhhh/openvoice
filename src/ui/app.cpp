@@ -25,11 +25,11 @@ App::App() {
 #endif
 
     const float mainScale =
-        ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor());
+            ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor());
 
     window = glfwCreateWindow(
-        (int)(1280 * mainScale),
-        (int)(800 * mainScale),
+        static_cast<int>(1280 * mainScale),
+        static_cast<int>(800 * mainScale),
         "OpenVoice",
         nullptr,
         nullptr);
@@ -40,14 +40,14 @@ App::App() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
-    ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO &io = ImGui::GetIO();
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
     ImGui::StyleColorsDark();
 
-    ImGuiStyle& style = ImGui::GetStyle();
+    ImGuiStyle &style = ImGui::GetStyle();
     style.ScaleAllSizes(mainScale);
     style.FontScaleDpi = mainScale;
 
@@ -81,6 +81,9 @@ void App::renderHomePage() {
     if (ImGui::Button("Load sound")) {
         audio_engine.load_sound("audio.wav");
     }
+    if (ImGui::Button("Stream microphone")) {
+        audio_engine.toggle_microphone_stream();
+    }
     if (ImGui::Button("Play sound")) {
         audio_engine.play();
     }
@@ -106,6 +109,7 @@ void App::renderNodeEditor() {
         nodeEditorOpen = false;
     }
 
+    n_manager.OnFrame(60);
     // Use the node_editor_manager class here
 
     ImGui::End();
