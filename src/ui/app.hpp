@@ -9,8 +9,8 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-
 #include "node_editor_manager.hpp"
+
 class App
 {
 public:

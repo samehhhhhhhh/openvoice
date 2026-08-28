@@ -25,7 +25,9 @@ Roadmap :
 - Show a window that contains a button that streams your microphone to your default output device. -- Done
 - Make different windows (Just homepage and node editor at least) -- Done !
 - Make an audio engine class. -- Done
-- Make a node editor -- Doing that now!
+- Make a node editor -- Done ! 
+- Make sure the audio engine node graph works proprely -> Doing that now
+- Make pressing shift + a open a context menu in the node editor to add a node. -> Doing that now
 - Make the connection between the node editor and the audio engine. 
 - Implement configuration saving.
 - Work on the configuration database.
