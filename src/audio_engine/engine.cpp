@@ -34,10 +34,12 @@ void engine::data_callback(ma_device* pDevice, void* pOutput, const void* pInput
     the data source is our pInput buffer. We need to update the underlying data source so that it
     read data from pInput.
     */
-    ma_audio_buffer_ref_set_data(&g_exciteData, pInput, frameCount);
 
+    result = ma_audio_buffer_ref_set_data(&g_exciteData, pInput, frameCount);
+    check_result("Failed to set data to buffer");
     /* With the source buffer configured we can now read directly from the node graph. */
-    ma_node_graph_read_pcm_frames(&g_nodeGraph, pOutput, frameCount, NULL);
+    result = ma_node_graph_read_pcm_frames(&g_nodeGraph, pOutput, frameCount, nullptr);
+    check_result("Failed to read from node graph");
 }
 
 

@@ -13,7 +13,7 @@ inline void check_result(const std::string msg)
 {
     if (result != MA_SUCCESS)
     {
-        std::cout << "error : " << msg << std::endl;
+        std::cout << "error : " << msg << "Error code : " << result <<  std::endl;
     }
 }
 

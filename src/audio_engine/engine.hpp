@@ -26,7 +26,7 @@
 #define DECAY               0.5f    /* Volume falloff for each echo. */
 
 #define DEVICE_FORMAT      ma_format_f32    /* Must always be f32 for this example because the node graph system only works with this. */
-#define DEVICE_CHANNELS    1                /* For this example, always set to 1. */
+#define DEVICE_CHANNELS    2                /* For this example, always set to 1. */
 
 
 static ma_node_graph g_nodeGraph;
@@ -90,8 +90,12 @@ public :
         // Node graph initialization
         ma_node_graph_config nodeGraphConfig = ma_node_graph_config_init(device.capture.channels);
 
+
         result = ma_node_graph_init(&nodeGraphConfig, NULL, &g_nodeGraph);
-        check_result("Failed to initialize node graph");
+        check_result("Failed to initialize node graph config");
+
+    ///////////// a vocoder has 2 inputs, a carrier and a modulation
+
 
         /* Vocoder. Attached straight to the endpoint. */
         vocoderNodeConfig = ma_vocoder_node_config_init(device.capture.channels, device.sampleRate);
@@ -99,36 +103,45 @@ public :
         result = ma_vocoder_node_init(&g_nodeGraph, &vocoderNodeConfig, NULL, &g_vocoderNode);
         check_result("Failed to initialize vocoder node");
 
-        ma_node_attach_output_bus(&g_vocoderNode, 0, ma_node_graph_get_endpoint(&g_nodeGraph), 0);
+        result = ma_node_attach_output_bus(&g_vocoderNode, 0, ma_node_graph_get_endpoint(&g_nodeGraph), 0);
+        check_result("Failed to attach vocoder output bus");
 
         /* Amplify the volume of the vocoder output because in my testing it is a bit quiet. */
-        ma_node_set_output_bus_volume(&g_vocoderNode, 0, 4);
+        result = ma_node_set_output_bus_volume(&g_vocoderNode, 0, 4);
+        check_result("Failed to set vocoder output bus volume");
 
+/////////////
 
         /* Source/carrier. Attached to input bus 0 of the vocoder node. */
         waveformConfig = ma_waveform_config_init(device.capture.format, device.capture.channels, device.sampleRate, ma_waveform_type_sawtooth, 1.0, 50);
 
         result = ma_waveform_init(&waveformConfig, &g_sourceData);
-        check_result("Failed to initialize waveform for excite node.");
+        check_result("Failed to initialize waveform.");
 
         sourceNodeConfig = ma_data_source_node_config_init(&g_sourceData);
 
+        // Actual source node for the carrier
         result = ma_data_source_node_init(&g_nodeGraph, &sourceNodeConfig, NULL, &g_sourceNode);
-        check_result("Failed to initialize excite node.");
+        check_result("Failed to initialize source node.");
 
-        ma_node_attach_output_bus(&g_sourceNode, 0, &g_vocoderNode, 0);
+        result = ma_node_attach_output_bus(&g_sourceNode, 0, &g_vocoderNode, 0);
+        check_result("Failed to attach source node output bus");
 
+    ////////////////
 
-        /* Excite/modulator. Attached to input bus 1 of the vocoder node. */
-        result = ma_audio_buffer_ref_init(device.capture.format, device.capture.channels, NULL, 0, &g_exciteData);
+        /* Excite/modulator. Attached to input bus 1 of the vocoder node. This is where is the microphone voice coming from */
+        result = ma_audio_buffer_ref_init(device.capture.format, 1, NULL, 0, &g_exciteData);
         check_result("Failed to initialize audio buffer for source.");
 
         exciteNodeConfig = ma_data_source_node_config_init(&g_exciteData);
 
+        // We set the excite as a member of the graph and its config
         result = ma_data_source_node_init(&g_nodeGraph, &exciteNodeConfig, NULL, &g_exciteNode);
         check_result("Failed to initialize source node.");
 
-        ma_node_attach_output_bus(&g_exciteNode, 0, &g_vocoderNode, 1);
+        // We attach the source node's output bus to the vocoder
+        result = ma_node_attach_output_bus(&g_exciteNode, 0, &g_vocoderNode, 1);
+        check_result("Failed to attach excite node output bus");
 
         result = ma_device_start(&device);
         check_result("Failed to start device");

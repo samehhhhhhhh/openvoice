@@ -2,7 +2,6 @@
 #include "app.hpp"
 
 App::App() {
-    std::cout << "HEY";
 
     glfwInit();
 
