@@ -26,7 +26,7 @@ Roadmap :
 - Make different windows (Just homepage and node editor at least) -- Done !
 - Make an audio engine class. -- Done
 - Make a node editor -- Done ! 
-- Make sure the audio engine node graph works proprely -> Doing that now
+- Make sure the audio engine node graph works proprely -> It does ! Still need to rewrite it in a way that makes it easier to manage nodes.
 - Make pressing shift + a open a context menu in the node editor to add a node. -> Doing that now
 - Make the connection between the node editor and the audio engine. 
 - Implement configuration saving.
