@@ -19,12 +19,15 @@ void engine::load_sound(const std::string &filename) {
 
 void engine::data_callback(ma_device* pDevice, void* pOutput, const void* pInput, const ma_uint32 frameCount) {
 
+    /* Recover the engine instance we stored in device_config.pUserData at init time. */
+    auto* e = static_cast<engine*>(pDevice->pUserData);
+
     /*
     This example assumes the playback and capture sides use the same format and channel count. The
     format must be f32.
     */
-    if ((pDevice->capture.format != DEVICE_FORMAT || pDevice->playback.format != DEVICE_FORMAT || pDevice->capture.channels != pDevice->playback.channels) && !stream_microphone) {
-        std::cout << "Invalid formats stuff at data_callback. \n";
+    if (pDevice->capture.format != DEVICE_FORMAT || pDevice->playback.format != DEVICE_FORMAT || pDevice->capture.channels != pDevice->playback.channels || !e->stream_microphone) {
+
         return;
     }
 
@@ -35,10 +38,10 @@ void engine::data_callback(ma_device* pDevice, void* pOutput, const void* pInput
     read data from pInput.
     */
 
-    result = ma_audio_buffer_ref_set_data(&g_exciteData, pInput, frameCount);
+    result = ma_audio_buffer_ref_set_data(&e->g_exciteData, pInput, frameCount);
     check_result("Failed to set data to buffer");
     /* With the source buffer configured we can now read directly from the node graph. */
-    result = ma_node_graph_read_pcm_frames(&g_nodeGraph, pOutput, frameCount, nullptr);
+    result = ma_node_graph_read_pcm_frames(&e->g_nodeGraph, pOutput, frameCount, nullptr);
     check_result("Failed to read from node graph");
 }
 

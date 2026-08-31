@@ -26,14 +26,10 @@
 #define DECAY               0.5f    /* Volume falloff for each echo. */
 
 #define DEVICE_FORMAT      ma_format_f32    /* Must always be f32 for this example because the node graph system only works with this. */
-#define DEVICE_CHANNELS    2                /* For this example, always set to 1. */
+#define DEVICE_CHANNELS    1               /* For this example, always set to 1. */
 
 
-static ma_node_graph g_nodeGraph;
-static ma_audio_buffer_ref g_exciteData;    /* The underlying data source of the excite node. */
 
-// Enabled by default
-static bool stream_microphone = true;
 
 class engine {
 
@@ -61,6 +57,11 @@ class engine {
     ma_vocoder_node     g_vocoderNode;   /* The vocoder node. */
 
 public :
+    ma_node_graph g_nodeGraph;
+    ma_audio_buffer_ref g_exciteData;    /* The underlying data source of the excite node. */
+
+    // Enabled by default
+    bool stream_microphone = true;
 
     // https://miniaud.io/docs/examples/duplex_effect.html
 
@@ -73,6 +74,8 @@ public :
 
     engine() {
 
+
+
         // Duplex audio device
         device_config = ma_device_config_init(ma_device_type_duplex);
         device_config.capture.pDeviceID  = NULL;
@@ -83,6 +86,7 @@ public :
         device_config.playback.format    = DEVICE_FORMAT;
         device_config.playback.channels  = DEVICE_CHANNELS;
         device_config.dataCallback       = data_callback;
+        device_config.pUserData          = this;
 
         result = ma_device_init(NULL, &device_config, &device);
         check_result("Failed to initialize device");
@@ -130,7 +134,7 @@ public :
     ////////////////
 
         /* Excite/modulator. Attached to input bus 1 of the vocoder node. This is where is the microphone voice coming from */
-        result = ma_audio_buffer_ref_init(device.capture.format, 1, NULL, 0, &g_exciteData);
+        result = ma_audio_buffer_ref_init(device.capture.format, DEVICE_CHANNELS, NULL, 0, &g_exciteData);
         check_result("Failed to initialize audio buffer for source.");
 
         exciteNodeConfig = ma_data_source_node_config_init(&g_exciteData);
@@ -152,7 +156,8 @@ public :
 
         check_result("Initialize the engine");
 
-    };
+
+    }
 
     void play();
     void load_sound(const std::string& filename);
