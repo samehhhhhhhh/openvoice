@@ -147,6 +147,8 @@ void App::run()
         // Also a search bar to search locally for voices.
         if (nodeEditorOpen) {
             renderNodeEditor();
+
+
         } else {
             renderHomePage();
         }
