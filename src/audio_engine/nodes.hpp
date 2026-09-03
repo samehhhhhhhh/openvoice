@@ -8,6 +8,22 @@
 #include "ma_vocoder_node.h"
 #include "utils.h"
 
+/* Data Format */
+#define FORMAT              ma_format_f32   /* Must always be f32. */
+#define CHANNELS            2
+#define SAMPLE_RATE         48000
+
+/* Effect Properties */
+#define LPF_BIAS            0.9f    /* Higher values means more bias towards the low pass filter (the low pass filter will be more audible). Lower values means more bias towards the echo. Must be between 0 and 1. */
+#define LPF_CUTOFF_FACTOR   80      /* High values = more filter. */
+#define LPF_ORDER           8
+#define DELAY_IN_SECONDS    0.2f
+#define DECAY               0.5f    /* Volume falloff for each echo. */
+
+#define DEVICE_FORMAT      ma_format_f32    /* Must always be f32 for this example because the node graph system only works with this. */
+#define DEVICE_CHANNELS    1               /* For this example, always set to 1. */
+
+
 class node
 {
 protected:
@@ -50,7 +66,7 @@ struct vocoder_node : public node
 
         m_Node = &g_vocoderNode;
 
-        vocoderNodeConfig = ma_vocoder_node_config_init(1, device.sampleRate);
+        vocoderNodeConfig = ma_vocoder_node_config_init(1, SAMPLE_RATE);
 
         result = ma_vocoder_node_init(&g_nodeGraph, &vocoderNodeConfig, nullptr, &g_vocoderNode);
         check_result("Failed to initialize vocoder node");
@@ -77,7 +93,7 @@ struct waveform_node : public node
     {
         m_Node = &g_sourceNode;
 
-        waveformConfig = ma_waveform_config_init(device.capture.format, device.capture.channels, device.sampleRate, ma_waveform_type_sawtooth, 1.0, 50);
+        waveformConfig = ma_waveform_config_init(DEVICE_FORMAT, DEVICE_CHANNELS, SAMPLE_RATE, ma_waveform_type_sawtooth, 1.0, 50);
 
         result = ma_waveform_init(&waveformConfig, &g_sourceData);
         check_result("Failed to initialize waveform.");
@@ -109,7 +125,7 @@ struct exciter_node : public node
         m_Node = &g_exciteNode;
 
         /* Excite/modulator. This is where is the microphone voice coming from */
-        result = ma_audio_buffer_ref_init(device.capture.format, device.capture.channels, nullptr, 0, &g_exciteData);
+        result = ma_audio_buffer_ref_init(DEVICE_FORMAT, DEVICE_CHANNELS, nullptr, 0, &g_exciteData);
         check_result("Failed to initialize audio buffer for source.");
 
         exciteNodeConfig = ma_data_source_node_config_init(&g_exciteData);

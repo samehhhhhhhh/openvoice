@@ -1,22 +1,10 @@
 #ifndef OPENVOICE_ENGINE_H
 #define OPENVOICE_ENGINE_H
+#include <memory>
+
 #include "../shared/includes.hpp"
 #include "nodes.hpp"
 
-/* Data Format */
-#define FORMAT              ma_format_f32   /* Must always be f32. */
-#define CHANNELS            2
-#define SAMPLE_RATE         48000
-
-/* Effect Properties */
-#define LPF_BIAS            0.9f    /* Higher values means more bias towards the low pass filter (the low pass filter will be more audible). Lower values means more bias towards the echo. Must be between 0 and 1. */
-#define LPF_CUTOFF_FACTOR   80      /* High values = more filter. */
-#define LPF_ORDER           8
-#define DELAY_IN_SECONDS    0.2f
-#define DECAY               0.5f    /* Volume falloff for each echo. */
-
-#define DEVICE_FORMAT      ma_format_f32    /* Must always be f32 for this example because the node graph system only works with this. */
-#define DEVICE_CHANNELS    1               /* For this example, always set to 1. */
 
 
 class engine {
@@ -31,9 +19,9 @@ class engine {
     ma_device_config device_config;
     ma_device device;
 
-    vocoder_node m_vocoder_node;
-    waveform_node m_waveform_node;
-    exciter_node m_excite_node;
+    std::unique_ptr<vocoder_node> m_vocoder_node;
+    std::unique_ptr<waveform_node> m_waveform_node;
+    std::unique_ptr<exciter_node> m_excite_node;
 
 public :
     ma_node_graph g_nodeGraph;
@@ -47,9 +35,7 @@ public :
     }
 
     engine()
-        : m_vocoder_node(g_nodeGraph, device),
-          m_waveform_node(g_nodeGraph, device),
-          m_excite_node(g_nodeGraph, device)
+
 {
 
         // Duplex audio device
@@ -68,13 +54,17 @@ public :
         check_result("Failed to initialize device");
 
         // Node graph initialization
-        const ma_node_graph_config nodeGraphConfig = ma_node_graph_config_init(device.capture.channels);
+        const ma_node_graph_config nodeGraphConfig = ma_node_graph_config_init(DEVICE_CHANNELS);
 
         result = ma_node_graph_init(&nodeGraphConfig, nullptr, &g_nodeGraph);
         check_result("Failed to initialize node graph config");
 
-        m_waveform_node.AttachTo(0, m_vocoder_node, 0);
-        m_excite_node.AttachTo(0, m_vocoder_node, 1);
+        m_vocoder_node = std::make_unique<vocoder_node>(g_nodeGraph, device);
+        m_waveform_node = std::make_unique<waveform_node>(g_nodeGraph, device);
+        m_excite_node = std::make_unique<exciter_node>(g_nodeGraph, device);
+
+        m_waveform_node->AttachTo(0, *m_vocoder_node, 0);
+        m_excite_node->AttachTo(0, *m_vocoder_node, 1);
 
         result = ma_device_start(&device);
         check_result("Failed to start device");
