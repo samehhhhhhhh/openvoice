@@ -52,6 +52,8 @@ App::App() {
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glslVersion);
+
+
 }
 
 
@@ -108,7 +110,7 @@ void App::renderNodeEditor() {
         nodeEditorOpen = false;
     }
 
-    n_manager.OnFrame(60);
+    n_manager.OnFrame(60, audio_engine.nodeGraph);
     // Use the node_editor_manager class here
 
     ImGui::End();

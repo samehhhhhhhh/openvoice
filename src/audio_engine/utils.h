@@ -5,7 +5,7 @@
 #ifndef OPENVOICE_UTILS_H
 #define OPENVOICE_UTILS_H
 
-
+#include <iostream>
 
 inline ma_result result;
 

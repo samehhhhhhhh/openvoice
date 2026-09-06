@@ -4,7 +4,7 @@
 
 #include "../shared/includes.hpp"
 #include "nodes.hpp"
-
+#include "node_graph.hpp"
 
 
 class engine {
@@ -16,16 +16,16 @@ class engine {
     ma_sound sound;
     ma_engine_config engineConfig;
 
+
+
     ma_device_config device_config;
     ma_device device;
 
-    std::unique_ptr<vocoder_node> m_vocoder_node;
-    std::unique_ptr<waveform_node> m_waveform_node;
-    std::unique_ptr<exciter_node> m_excite_node;
+
 
 public :
-    ma_node_graph g_nodeGraph;
 
+    node_graph nodeGraph;
     // Enabled by default
     bool stream_microphone = true;
 
@@ -53,18 +53,8 @@ public :
         result = ma_device_init(nullptr, &device_config, &device);
         check_result("Failed to initialize device");
 
-        // Node graph initialization
-        const ma_node_graph_config nodeGraphConfig = ma_node_graph_config_init(DEVICE_CHANNELS);
+        // initialize nodeGraph here
 
-        result = ma_node_graph_init(&nodeGraphConfig, nullptr, &g_nodeGraph);
-        check_result("Failed to initialize node graph config");
-
-        m_vocoder_node = std::make_unique<vocoder_node>(g_nodeGraph, device);
-        m_waveform_node = std::make_unique<waveform_node>(g_nodeGraph, device);
-        m_excite_node = std::make_unique<exciter_node>(g_nodeGraph, device);
-
-        m_waveform_node->AttachTo(0, *m_vocoder_node, 0);
-        m_excite_node->AttachTo(0, *m_vocoder_node, 1);
 
         result = ma_device_start(&device);
         check_result("Failed to start device");
@@ -82,9 +72,7 @@ public :
 
     ~engine() {
         ma_device_stop(&device);
-        ma_node_graph_uninit(&g_nodeGraph, nullptr);
         ma_device_uninit(&device);
-
         ma_sound_uninit(&sound);
         ma_engine_uninit(&audio_engine);
 
