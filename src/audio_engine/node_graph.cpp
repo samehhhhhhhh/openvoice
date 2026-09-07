@@ -12,7 +12,7 @@ void node_graph::add_node(node* target_node)
         if (i == nullptr)
         {
             i = target_node;
-            target_node->ID = idGen.get_id();
+            target_node->ID = id_generator::get_id();
             break;
         }
 

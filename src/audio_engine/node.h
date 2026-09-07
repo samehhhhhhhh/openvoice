@@ -4,6 +4,37 @@
 
 #include "ma_vocoder_node.h"
 #include "utils.h"
+#include <vector>
+#include "id_generator.hpp"
+
+enum class pin_types
+{
+    INPUT = 1,
+    OUTPUT
+};
+struct pin
+{
+    std::string title;
+    std::string description;
+    pin_types type;
+    unsigned int index;
+    unsigned int ID;
+};
+
+struct node_config
+{
+    std::string title = "Untitled node";
+    std::string description;
+    std::string color;
+    std::vector<pin> pins;
+
+    void add_pin(std::string title, std::string description, pin_types type, unsigned int index, unsigned int ID)
+    {
+        const pin m_pin {.title = title, .description = description, .type = type, .index = index, .ID = ID};
+        pins.push_back(m_pin);
+    }
+
+};
 
 class node
 {
@@ -14,10 +45,7 @@ protected:
     ma_node* m_Node = nullptr;
     unsigned int inputBusCount = 0;
     unsigned int outputBusCount = 0;
-
-
-
-
+    node_config config;
 
 public :
 

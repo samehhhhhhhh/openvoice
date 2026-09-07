@@ -27,12 +27,20 @@ struct vocoder_node : public node
 {
     ma_vocoder_node_config vocoderNodeConfig;
     ma_vocoder_node     g_vocoderNode;   /* The vocoder node. */
+
     vocoder_node(ma_node_graph &g_nodeGraph)
     {
 
         // This node has 1 output bus and 2 input buses
         inputBusCount = 2;
         outputBusCount = 1;
+
+        config.title = "Vocoder node";
+        config.description = "This node lets you modulate an audio stream with a waveform.";
+
+        config.add_pin("Carrier", "This is where the waveform goes into", pin_types::INPUT, 0, id_generator::get_id());
+        config.add_pin("Modulator", "This is where the voice goes into", pin_types::INPUT, 1, id_generator::get_id());
+        config.add_pin("Output", "An output brah", pin_types::OUTPUT, 0, id_generator::get_id());
 
         m_Node = &g_vocoderNode;
 

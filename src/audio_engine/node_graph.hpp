@@ -8,14 +8,14 @@
 #include <memory>
 #include "nodes.hpp"
 #include <array>
-#include "id_generator.hpp"
+
 class node_graph
 {
     std::unique_ptr<vocoder_node> m_vocoder_node;
     std::unique_ptr<waveform_node> m_waveform_node;
     std::unique_ptr<exciter_node> m_excite_node;
 
-    id_generator idGen;
+
     ma_node_graph m_nodeGraph;
 
     // TODO: Change this from a raw value to a variable that can be set
@@ -25,7 +25,6 @@ class node_graph
 public:
 
     node_graph()
-        : idGen()
     {
 
         const ma_node_graph_config nodeGraphConfig = ma_node_graph_config_init(DEVICE_CHANNELS);

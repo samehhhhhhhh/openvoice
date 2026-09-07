@@ -6,15 +6,12 @@
 class id_generator
 {
 
-    unsigned int next_id;
+    inline static unsigned int next_id = 1;
+
 
 public:
-    id_generator()
-    {
-        next_id =  1;
-    }
 
-    unsigned int get_id()
+    static unsigned int get_id()
     {
         return next_id++;
     }
