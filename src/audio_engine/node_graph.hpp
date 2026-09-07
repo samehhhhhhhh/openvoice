@@ -1,6 +1,3 @@
-//
-// Created by samehh on 9/4/26.
-//
 
 #ifndef OPENVOICE_NODE_GRAPH_HPP
 #define OPENVOICE_NODE_GRAPH_HPP

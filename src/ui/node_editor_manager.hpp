@@ -28,7 +28,7 @@ class node_editor_man {
 
     ed::EditorContext* m_Context = nullptr;
 
-    void DrawNode(unsigned int& uniqueId);
+    void DrawNode(node* ActiveNode);
 
     void GetNodesFromNodeGraph();
 

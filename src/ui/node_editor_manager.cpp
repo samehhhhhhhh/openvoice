@@ -22,7 +22,7 @@ void node_editor_man::OnFrame(float deltaTime, node_graph& ng) {
     for (int i = 0; i < graph_nodes.size(); i++)
     {
         if (graph_nodes.at(i) != nullptr)
-            DrawNode(graph_nodes[i]->ID);
+            DrawNode(graph_nodes[i]);
 
     }
 
@@ -32,21 +32,71 @@ void node_editor_man::OnFrame(float deltaTime, node_graph& ng) {
     //ImGui::ShowMetricsWindow();
 }
 
-void node_editor_man::DrawNode(unsigned int& uniqueId)
+#include <utility>
+
+std::pair<pin, pin> FindSameIndexPin(node* ActiveNode, unsigned int index)
+{
+    pin a;
+    pin b;
+    for (const auto& i : ActiveNode->config.pins)
+    {
+        if (i.index == index)
+        {
+            if (i.type == pin_types::INPUT)
+            {
+                a = i;
+            } else
+            {
+                b = i;
+            }
+        }
+
+        if (a.index == index && b.index == index)
+        {
+            break;
+        }
+    }
+
+    return {a, b};
+}
+int max_index(node * ActiveNode)
 {
 
-    ed::BeginNode(uniqueId);
-    ImGui::Text("Node A");
-    /*
-        ed::BeginPin(uniqueId++ , ed::PinKind::Input);
-        ImGui::Text("-> In");
-        ed::EndPin();
+    int max_index = 0;
+
+
+    for (const auto& i : ActiveNode->config.pins)
+    {
+        if (i.index > max_index) max_index = i.index;
+    }
+
+    return max_index;
+}
+void node_editor_man::DrawNode(node* ActiveNode)
+{
+
+    ed::BeginNode(ActiveNode->ID);
+    ImGui::Text(ActiveNode->config.title.c_str());
+
+    for (int i = 0; i <= max_index(ActiveNode); i++)
+    {
+        std::pair <pin, pin> a = FindSameIndexPin(ActiveNode, i);
+
+        // We make sure that this is not a one pin line
+        if (a.first.ID != 0)
+        {
+            ed::BeginPin(a.first.ID , ed::PinKind::Input);
+            ImGui::Text(a.first.title.c_str());
+            ed::EndPin();
+        }
         ImGui::SameLine();
-        ed::BeginPin(uniqueId++ , ed::PinKind::Output);
-        ImGui::Text("Out ->");
-        ed::EndPin();
-        */
+        if (a.second.ID != 0)
+        {
+            ed::BeginPin(a.second.ID , ed::PinKind::Output);
+            ImGui::Text(a.second.title.c_str());
+            ed::EndPin();
+        }
 
+    }
     ed::EndNode();
-
 }

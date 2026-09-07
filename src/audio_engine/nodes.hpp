@@ -31,10 +31,6 @@ struct vocoder_node : public node
     vocoder_node(ma_node_graph &g_nodeGraph)
     {
 
-        // This node has 1 output bus and 2 input buses
-        inputBusCount = 2;
-        outputBusCount = 1;
-
         config.title = "Vocoder node";
         config.description = "This node lets you modulate an audio stream with a waveform.";
 
@@ -70,8 +66,10 @@ struct waveform_node : public node
     waveform_node(ma_node_graph &g_nodeGraph)
     {
 
-        // This node has 1 output bus
-        outputBusCount = 1;
+        config.title = "Waveform node";
+        config.description = "A waveform node";
+
+        config.add_pin("Output", "An output brah", pin_types::OUTPUT, 0, id_generator::get_id());
 
         m_Node = &g_sourceNode;
 
@@ -105,9 +103,10 @@ struct exciter_node : public node
     exciter_node(ma_node_graph &g_nodeGraph)
     {
 
-        // This node has 1 output bus
-        outputBusCount = 1;
+        config.title = "Excite node";
+        config.description = "Litteraly your microphone";
 
+        config.add_pin("Output", "An output brah", pin_types::OUTPUT, 0, id_generator::get_id());
         m_Node = &g_exciteNode;
 
         /* Excite/modulator. This is where is the microphone voice coming from */
@@ -129,11 +128,6 @@ struct exciter_node : public node
 
 };
 
-
-
-
-
-
-
+// TODO: Endpoint node
 
 #endif //OPENVOICE_NODES_H

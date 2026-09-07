@@ -1,6 +1,3 @@
-//
-// Created by samehh on 9/4/26.
-//
 
 #include "node_graph.hpp"
 
