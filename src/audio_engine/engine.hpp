@@ -9,19 +9,14 @@
 
 class engine {
 
-
     static void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
 
     ma_engine audio_engine;
     ma_sound sound;
     ma_engine_config engineConfig;
 
-
-
     ma_device_config device_config;
     ma_device device;
-
-
 
 public :
 
@@ -54,7 +49,6 @@ public :
         check_result("Failed to initialize device");
 
         // initialize nodeGraph here
-
 
         result = ma_device_start(&device);
         check_result("Failed to start device");
