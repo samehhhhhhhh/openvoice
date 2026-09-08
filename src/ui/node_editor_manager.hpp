@@ -22,8 +22,16 @@
  *
  *
  */
-
 namespace ed = ax::NodeEditor;
+
+struct LinkInfo
+{
+    ed::LinkId Id;
+    ed::PinId  InputId;
+    ed::PinId  OutputId;
+};
+
+
 class node_editor_man {
 
     ed::EditorContext* m_Context = nullptr;
@@ -31,6 +39,8 @@ class node_editor_man {
     void DrawNode(node* ActiveNode);
 
     void GetNodesFromNodeGraph();
+
+    std::vector<LinkInfo> m_Links;
 
 
 
@@ -42,6 +52,7 @@ public:
         m_Context = ed::CreateEditor(&config);
     }
 
+    void update_links(node_graph& ng);
 
     void OnFrame(float deltaTime, node_graph& ng);
 
