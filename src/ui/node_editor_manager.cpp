@@ -7,18 +7,8 @@
 #include <algorithm>
 #include <functional>
 
-void node_editor_man::update_links(node_graph& ng)
-{
-    // loop through the graph:
-    // - make sure that all node connections are in the list.
-    // - Also make sure that all links created are actually linked (Rerun attach method)
-}
-
-
 void node_editor_man::OnFrame(float deltaTime, node_graph& ng) {
     auto& io = ImGui::GetIO();
-
-    update_links(ng);
 
     ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
 
@@ -26,7 +16,6 @@ void node_editor_man::OnFrame(float deltaTime, node_graph& ng) {
 
     ed::SetCurrentEditor(m_Context);
     ed::Begin("My Editor", ImVec2(0.0, 0.0f));
-    int uniqueId = 1;
 
     auto graph_nodes {ng.get_active_nodes()};
 
@@ -36,6 +25,12 @@ void node_editor_man::OnFrame(float deltaTime, node_graph& ng) {
             DrawNode(graph_nodes[i]);
 
     }
+
+    // The node graph owns the links, the editor only mirrors them
+    DrawLinks(ng);
+
+    HandleLinkCreation(ng);
+    HandleLinkDeletion(ng);
 
     ed::End();
     ed::SetCurrentEditor(nullptr);
@@ -111,31 +106,50 @@ void node_editor_man::DrawNode(node* ActiveNode)
 
     }
     ed::EndNode();
+}
 
+void node_editor_man::DrawLinks(const node_graph& ng)
+{
+    for (const auto& linkInfo : ng.get_links())
+        ed::Link(ed::LinkId(linkInfo.ID),
+                 ed::PinId(linkInfo.output_pin_ID),
+                 ed::PinId(linkInfo.input_pin_ID));
+}
 
-// Drawing exiting links
-    for (auto& linkInfo : m_Links)
-        ed::Link(linkInfo.Id, linkInfo.InputId, linkInfo.OutputId);
-
-    // Handle creation action
+void node_editor_man::HandleLinkCreation(node_graph& ng)
+{
     if (ed::BeginCreate())
+    {
+        ed::PinId startPinId, endPinId;
+        if (ed::QueryNewLink(&startPinId, &endPinId))
         {
-            ed::PinId inputPinId, outputPinId;
-            if (ed::QueryNewLink(&inputPinId, &outputPinId))
+            if (startPinId && endPinId)
             {
-                if (inputPinId && outputPinId)
-                {
-                    if (ed::AcceptNewItem())
-                    {
-                        m_Links.push_back({ ed::LinkId(id_generator::get_id()), inputPinId, outputPinId });
+                const pin* startPin = ng.find_pin(static_cast<unsigned int>(startPinId.Get()));
+                const pin* endPin   = ng.find_pin(static_cast<unsigned int>(endPinId.Get()));
 
-                        ed::Link(m_Links.back().Id, m_Links.back().InputId, m_Links.back().OutputId);
-                    }
+                // One side has to be an output and the other an input, and never the same node
+                const bool valid = startPin != nullptr && endPin != nullptr
+                    && startPin->type != endPin->type
+                    && ng.find_node_by_pin(startPin->ID) != ng.find_node_by_pin(endPin->ID);
+
+                if (!valid)
+                {
+                    ed::RejectNewItem();
+                }
+                else if (ed::AcceptNewItem())
+                {
+                    // This both stores the link and attaches the nodes in the audio graph
+                    ng.add_link(startPin->ID, endPin->ID);
                 }
             }
         }
+    }
     ed::EndCreate();
+}
 
+void node_editor_man::HandleLinkDeletion(node_graph& ng)
+{
     if (ed::BeginDelete())
     {
         ed::LinkId deletedLinkId;
@@ -143,22 +157,11 @@ void node_editor_man::DrawNode(node* ActiveNode)
         {
             if (ed::AcceptDeletedItem())
             {
-                for (auto it = m_Links.begin(); it != m_Links.end(); ++it)
-                {
-                    if (it->Id == deletedLinkId)
-                    {
-                        m_Links.erase(it);
-                        break;
-                    }
-                }
+                // Drops the link and detaches the output bus it was using
+                ng.remove_link(static_cast<unsigned int>(deletedLinkId.Get()));
             }
 
         }
     }
     ed::EndDelete();
-
-
-
-
-
 }

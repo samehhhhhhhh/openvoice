@@ -24,14 +24,6 @@
  */
 namespace ed = ax::NodeEditor;
 
-struct LinkInfo
-{
-    ed::LinkId Id;
-    ed::PinId  InputId;
-    ed::PinId  OutputId;
-};
-
-
 class node_editor_man {
 
     ed::EditorContext* m_Context = nullptr;
@@ -40,9 +32,14 @@ class node_editor_man {
 
     void GetNodesFromNodeGraph();
 
-    std::vector<LinkInfo> m_Links;
+    // Draws every link the node graph currently holds
+    void DrawLinks(const node_graph& ng);
 
+    // Turns a link dragged in the editor into a real node attachment
+    void HandleLinkCreation(node_graph& ng);
 
+    // Removes the link from the graph and detaches the nodes
+    void HandleLinkDeletion(node_graph& ng);
 
 public:
     node_editor_man()
@@ -51,8 +48,6 @@ public:
         config.SettingsFile = "Simple.json";
         m_Context = ed::CreateEditor(&config);
     }
-
-    void update_links(node_graph& ng);
 
     void OnFrame(float deltaTime, node_graph& ng);
 

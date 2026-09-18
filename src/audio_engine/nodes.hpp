@@ -56,6 +56,22 @@ struct vocoder_node : public node
     }
 };
 
+
+struct endpoint_node : public node
+{
+    endpoint_node(ma_node_graph &g_nodeGraph)
+    {
+        config.title = "Endpoint node";
+        config.description = "Endpoint node";
+
+        config.add_pin("Input", "This audio will get sent to the output device.", pin_types::INPUT, 0, id_generator::get_id());
+
+        m_Node = ma_node_graph_get_endpoint(&g_nodeGraph);
+
+
+    }
+};
+
 struct waveform_node : public node
 {
     ma_waveform_config waveformConfig;

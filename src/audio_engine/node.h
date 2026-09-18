@@ -21,6 +21,14 @@ struct pin
     unsigned int ID = 0; // default for verification later on
 };
 
+/* A connection between an output pin of one node and an input pin of another one. */
+struct link
+{
+    unsigned int ID = 0;
+    unsigned int output_pin_ID = 0; // The pin the audio comes from
+    unsigned int input_pin_ID = 0;  // The pin the audio goes into
+};
+
 struct node_config
 {
     std::string title = "Untitled node";
@@ -32,6 +40,24 @@ struct node_config
     {
         const pin m_pin {.title = title, .description = description, .type = type, .index = index, .ID = ID};
         pins.push_back(m_pin);
+    }
+
+    const pin* find_pin_by_id(const unsigned int ID) const
+    {
+        for (const auto& i : pins)
+        {
+            if (i.ID == ID) return &i;
+        }
+        return nullptr;
+    }
+
+    const pin* find_pin(const pin_types type, const unsigned int index) const
+    {
+        for (const auto& i : pins)
+        {
+            if (i.type == type && i.index == index) return &i;
+        }
+        return nullptr;
     }
 
 };
@@ -50,6 +76,7 @@ public :
     void AttachTo(const unsigned int OutputBus, ma_node* target_node, const unsigned int TargetBus) const
 {
     result = ma_node_attach_output_bus(m_Node, OutputBus, target_node, TargetBus);
+
     check_result("Failed to attach vocoder output bus");
 }
 
@@ -57,6 +84,13 @@ public :
 {
     result = ma_node_attach_output_bus(m_Node, OutputBus, target_node.m_Node, TargetBus);
     check_result("Failed to attach vocoder output bus");
+}
+
+    /* Undoes an AttachTo on the given output bus. */
+    void DetachFrom(const unsigned int OutputBus) const
+{
+    result = ma_node_detach_output_bus(m_Node, OutputBus);
+    check_result("Failed to detach node output bus");
 }
 
     void SetOutputBusVolume(const unsigned int OutputBus,const float volume) const
