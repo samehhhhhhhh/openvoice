@@ -14,15 +14,48 @@ void node_editor_man::OnFrame(float deltaTime, node_graph& ng) {
 
     ImGui::Separator();
 
-    ed::SetCurrentEditor(m_Context);
-    ed::Begin("My Editor", ImVec2(0.0, 0.0f));
+    auto paneWidth = ImGui::GetContentRegionAvail().x;
 
-    auto graph_nodes {ng.get_active_nodes()};
+    ed::SetCurrentEditor(m_Context);
+
+    // Button position relative to the screen coordinate of the editor canvas 
+    auto pos = ImGui::GetCursorScreenPos();
+    pos.x += 10.0f;
+    pos.y += 10.0f;
+
+
+    ed::Begin("My Editor", ImVec2(0.0, 0.0f));
+    
+    ed::Suspend();
+    // Create at top left the create node button.
+    
+    ImGui::SetCursorScreenPos(pos);
+
+    if (ImGui::Button("Create node"))
+        ImGui::OpenPopup("nodes");
+    node* selected_node = nullptr;
+    if(ImGui::BeginPopup("nodes"))
+    {
+        
+        ImGui::SeparatorText("Available nodes : ");
+        
+        for(auto const & i : ng.get_node_types())
+            
+            if(ImGui::Selectable(i.title))
+                ng.add_node(i); 
+                
+        ImGui::EndPopup();
+        
+    }
+
+    ed::Resume();
+
+    const auto& graph_nodes {ng.get_active_nodes()};
 
     for (int i = 0; i < graph_nodes.size(); i++)
     {
         if (graph_nodes.at(i) != nullptr)
-            DrawNode(graph_nodes[i]);
+            DrawNode(graph_nodes[i].get());
 
     }
 

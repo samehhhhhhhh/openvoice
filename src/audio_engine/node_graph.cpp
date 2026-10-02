@@ -1,15 +1,15 @@
 
 #include "node_graph.hpp"
 
-void node_graph::add_node(node* target_node)
+void node_graph::add_node(node_descriptor target_node)
 {
     for (auto& i : active_nodes)
     {
         // Is free
         if (i == nullptr)
         {
-            i = target_node;
-            target_node->ID = id_generator::get_id();
+            i = target_node.create(m_nodeGraph);
+            i->ID = id_generator::get_id();
             break;
         }
 
@@ -20,30 +20,25 @@ void node_graph::add_node(node* target_node)
     }
 }
 
-void node_graph::remove_node(node* target_node)
+void node_graph::remove_node(std::unique_ptr<node> target_node)
 {
     for (auto& i : active_nodes)
     {
         if (i == target_node)
         {
             // The links of a node that is gone have to go with it
-            for (auto it = links.begin(); it != links.end();)
+            for (const auto &it : links)
             {
-                if (target_node->config.find_pin_by_id(it->output_pin_ID) != nullptr
-                    || target_node->config.find_pin_by_id(it->input_pin_ID) != nullptr)
+                if (target_node->config.find_pin_by_id(it.output_pin_ID) != nullptr
+                    || target_node->config.find_pin_by_id(it.input_pin_ID) != nullptr)
                 {
-                    const unsigned int link_ID = it->ID;
+                    const unsigned int link_ID = it.ID;
                     remove_link(link_ID);
-                    it = links.begin();
-                }
-                else
-                {
-                    ++it;
+                    
                 }
             }
 
             i = nullptr;
-            delete(target_node);
             break;
         }
         if (i == active_nodes.back())
@@ -53,13 +48,13 @@ void node_graph::remove_node(node* target_node)
     }
 }
 
-node* node_graph::find_node_by_pin(const unsigned int pin_ID) const
+node* node_graph::find_node_by_pin(unsigned int pin_ID) 
 {
     for (const auto& i : active_nodes)
     {
         if (i == nullptr) continue;
 
-        if (i->config.find_pin_by_id(pin_ID) != nullptr) return i;
+        if (i->config.find_pin_by_id(pin_ID) != nullptr) return i.get();
     }
 
     return nullptr;

@@ -6,23 +6,69 @@
 #include <memory>
 #include "nodes.hpp"
 #include <array>
+#include <functional>
+struct node_descriptor
+{
+    const char* title;
+    std::function<std::unique_ptr<node>(ma_node_graph&)> create;
+    bool ispublic;
+};
+
 
 class node_graph
 {
-    std::unique_ptr<vocoder_node> m_vocoder_node;
-    std::unique_ptr<waveform_node> m_waveform_node;
-    std::unique_ptr<exciter_node> m_excite_node;
-    std::unique_ptr<endpoint_node> m_endpoint_node;
-
 
     ma_node_graph m_nodeGraph;
 
     // TODO: Change this from a raw value to a variable that can be set
     // btw : index of element is the ui ID.
-    std::array<node*, 20> active_nodes {nullptr};
+    std::array<std::unique_ptr<node>, 20> active_nodes {nullptr};
 
     // Every connection that currently exists in the graph. The UI draws these.
     std::vector<link> links;
+
+    // I got recommended doing this by people : 
+    std::array<node_descriptor, 4> node_types {{
+        {
+            "Vocoder node",
+            [](ma_node_graph& graph)
+            {
+                return std::make_unique<vocoder_node>(graph);
+            },
+            true
+        },
+        {
+            "Exciter node",
+            [](ma_node_graph& graph)
+            {
+                return std::make_unique<exciter_node>(graph);
+            },
+            false
+        },
+        {
+            "WaveForm node",
+            [](ma_node_graph& graph)
+            {
+                return std::make_unique<waveform_node>(graph);
+            },
+            true
+        },
+        {
+            "Endpoint node",
+            [](ma_node_graph& graph)
+            {
+                return std::make_unique<endpoint_node>(graph);
+            },
+            false
+        }
+    }};
+
+    enum nodes {
+        VOCODER_NODE = 0,
+        EXCITER_NODE,
+        WAVEFORM_NODE,
+        ENDPOINT_NODE
+    };
 
 
 public:
@@ -33,48 +79,29 @@ public:
         const ma_node_graph_config nodeGraphConfig = ma_node_graph_config_init(DEVICE_CHANNELS);
 
         result = ma_node_graph_init(&nodeGraphConfig, nullptr, &m_nodeGraph);
-        check_result("Failed to initialize node graph config");
+        check_result("Failed to initialize node graph config");        
 
-        /////
-
-        m_vocoder_node = std::make_unique<vocoder_node>(m_nodeGraph);
-        m_waveform_node = std::make_unique<waveform_node>(m_nodeGraph);
-        m_excite_node = std::make_unique<exciter_node>(m_nodeGraph);
-        m_endpoint_node = std::make_unique<endpoint_node>(m_nodeGraph);
-
-        add_node(m_vocoder_node.get());
-        add_node(m_waveform_node.get());
-        add_node(m_excite_node.get());
-        add_node(m_endpoint_node.get());
-
-        // Connection
-        add_link(m_waveform_node->config.find_pin(pin_types::OUTPUT, 0)->ID,
-                 m_vocoder_node->config.find_pin(pin_types::INPUT, 0)->ID);
-
-        add_link(m_excite_node->config.find_pin(pin_types::OUTPUT, 0)->ID,
-                 m_vocoder_node->config.find_pin(pin_types::INPUT, 1)->ID);
-        
-        add_link(m_vocoder_node->config.find_pin(pin_types::OUTPUT, 0)->ID,
-                 m_endpoint_node->config.find_pin(pin_types::INPUT, 0)->ID);
     }
+
 
     /* Sets the exciter node content (Input) */
     void set_input_exciter(const void * Data, unsigned int frameCount)
     {
-
-        result = ma_audio_buffer_ref_set_data(&m_excite_node->g_exciteData, Data, frameCount);
+        result = ma_audio_buffer_ref_set_data(active_nodes[0]->get_audiobuffer(), Data, frameCount);
         check_result("Failed to set data to buffer");
 
     }
 
+    
+
     // Basically just adding a pointer to a node into the array
-    void add_node(node* target_node);
+    void add_node(node_descriptor target_node);
 
     // Looks in the array for the node, when found sets it to nullptr
-    void remove_node(node* target_node);
+    void remove_node(std::unique_ptr<node> target_node);
 
     // Returns the node owning the given pin, nullptr when no active node has it
-    node* find_node_by_pin(unsigned int pin_ID) const;
+    node* find_node_by_pin(unsigned int pin_ID);
 
     // Returns the pin itself, nullptr when not found
     const pin* find_pin(unsigned int pin_ID) const;
@@ -89,9 +116,13 @@ public:
 
     const std::vector<link>& get_links() const { return links; }
 
-    std::array<node*, 20> get_active_nodes() const { return active_nodes; }
+    std::array<std::unique_ptr<node>, 20>& get_active_nodes() { return active_nodes; }
 
     ma_node_graph& get_nodeGraph() { return m_nodeGraph; }
+
+    std::array<node_descriptor, 4> get_node_types() {
+        return node_types;
+    }
 
     ~node_graph()
     {

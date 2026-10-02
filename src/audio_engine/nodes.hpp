@@ -45,8 +45,6 @@ struct vocoder_node : public node
         result = ma_vocoder_node_init(&g_nodeGraph, &vocoderNodeConfig, nullptr, &g_vocoderNode);
         check_result("Failed to initialize vocoder node");
 
-        AttachTo(0, ma_node_graph_get_endpoint(&g_nodeGraph), 0);
-
         SetOutputBusVolume(0, 4);
     }
 
@@ -135,6 +133,10 @@ struct exciter_node : public node
         result = ma_data_source_node_init(&g_nodeGraph, &exciteNodeConfig, nullptr, &g_exciteNode);
         check_result("Failed to initialize source node.");
 
+    }
+
+    ma_audio_buffer_ref* get_audiobuffer() override {
+        return &g_exciteData;
     }
 
     ~exciter_node()

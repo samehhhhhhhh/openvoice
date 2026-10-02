@@ -98,6 +98,14 @@ public :
     result = ma_node_set_output_bus_volume(m_Node, OutputBus, volume);
     check_result("Failed to set node output bus volume");
 }
+
+    virtual ma_audio_buffer_ref* get_audiobuffer() {
+        return nullptr;
+    }
+
+    std::string get_title() {
+        return config.title;
+    }
 };
 
 
