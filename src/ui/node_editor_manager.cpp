@@ -3,7 +3,6 @@
 //
 
 #include "node_editor_manager.hpp"
-
 #include <algorithm>
 #include <functional>
 
