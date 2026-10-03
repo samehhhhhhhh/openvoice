@@ -3,8 +3,8 @@
 #ifndef OPENVOICE_APP_H
 #define OPENVOICE_APP_H
 #include <GLFW/glfw3.h>
-#include "../audio_engine/engine.hpp"
-
+#include "engine.hpp"
+#include "device_manager.hpp"
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -19,6 +19,8 @@ public:
 
     engine audio_engine;
     node_editor_man n_manager;
+
+    device_manager devices;
 
     void run();
 

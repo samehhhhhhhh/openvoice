@@ -68,6 +68,7 @@ App::~App()
 }
 
 void App::renderHomePage() {
+
     ImGuiIO& io = ImGui::GetIO();
     ImGui::Begin("Openvoice", nullptr, ImGuiWindowFlags_NoDecoration);
 
@@ -92,6 +93,39 @@ void App::renderHomePage() {
     if (ImGui::Button("Open Node editor")) {
         nodeEditorOpen = true;
     }
+
+    if(ImGui::Button("Select Input Device")) {
+        ImGui::OpenPopup("input_select");
+    }
+    if(ImGui::Button("Select Monitor Device")) {
+        ImGui::OpenPopup("output_select");
+    }
+
+    if(ImGui::BeginPopup("input_select")) {
+        ImGui::SeparatorText("Devices : ");
+
+        devices.update_devices();
+        for(int i = 0; i < devices.captureDeviceCount; i++) {
+            
+            if(ImGui::Selectable(devices.pCaptureDeviceInfos[i].name)) {
+                audio_engine.set_dev(&devices.pCaptureDeviceInfos[i].id, DEVICE_CAPTURE);   
+            }
+        }
+        ImGui::EndPopup();
+    }
+    if(ImGui::BeginPopup("output_select")) {
+        ImGui::SeparatorText("Devices : ");
+        devices.update_devices();
+        for(int i = 0; i < devices.playbackDeviceCount; i++) {
+            if(ImGui::Selectable(devices.pPlaybackDeviceInfos[i].name)) {
+                audio_engine.set_dev(&devices.pPlaybackDeviceInfos[i].id, DEVICE_PLAYBACK);    
+            }
+            
+        }
+        ImGui::EndPopup();
+    }
+
+
 
     // Display all locally saved voice files.
     // Make a card for every sound.

@@ -2,7 +2,7 @@
 #ifndef OPENVOICE_NODE_GRAPH_HPP
 #define OPENVOICE_NODE_GRAPH_HPP
 
-
+#include "miniaudio.h"
 #include <memory>
 #include "nodes.hpp"
 #include <array>
@@ -79,7 +79,10 @@ public:
         const ma_node_graph_config nodeGraphConfig = ma_node_graph_config_init(DEVICE_CHANNELS);
 
         result = ma_node_graph_init(&nodeGraphConfig, nullptr, &m_nodeGraph);
-        check_result("Failed to initialize node graph config");        
+        check_result("Failed to initialize node graph config");    
+        
+        add_node(node_types[EXCITER_NODE]);
+        add_node(node_types[ENDPOINT_NODE]);
 
     }
 

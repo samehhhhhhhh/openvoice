@@ -14,7 +14,7 @@ target("miniaudio")
     set_kind("shared")
 
 target("audio_engine")
-    add_includedirs("src/audio_engine")
+    add_includedirs("src/audio_engine", {public = true})
     add_files("src/audio_engine/*.cpp")
     set_kind("shared")
     add_includedirs("vendor/voclib")
