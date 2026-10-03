@@ -20,15 +20,5 @@ The voice configuration is then stored in a file that is stored in a folder that
 installed on the client. Thus, the user can either acquire his own configuration files or use the built in database
 (Just a repository containing configurations made by the community)
 
-Roadmap : 
-
-- Show a window that contains a button that streams your microphone to your default output device. -- Done
-- Make different windows (Just homepage and node editor at least) -- Done !
-- Make an audio engine class. -- Done
-- Make a node editor -- Done ! 
-- Make sure the audio engine node graph works proprely -> Done !
-- Make pressing shift + a open a context menu in the node editor to add a node. -> In progress...
-- Make the connection between the node editor and the audio engine. Working on this now
-- Implement configuration saving.
-- Work on the configuration database.
+Might use https://avaloniaui.net/ for UI
 
