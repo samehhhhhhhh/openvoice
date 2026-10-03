@@ -3,7 +3,7 @@
 #define OPENVOICE_NODE_H
 
 #include "ma_vocoder_node.h"
-#include "utils.h"
+#include "utils.hpp"
 #include <vector>
 #include "id_generator.hpp"
 

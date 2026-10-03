@@ -5,8 +5,7 @@
 #ifndef OPENVOICE_NODES_H
 #define OPENVOICE_NODES_H
 
-#include "node.h"
-
+#include "node.hpp"
 /* Data Format */
 #define FORMAT              ma_format_f32   /* Must always be f32. */
 #define CHANNELS            2
