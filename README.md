@@ -1,7 +1,7 @@
 
 # OpenVoice
 
-![alt text](image.png)
+![A node editor](images/image.png)
 
 Description : 
 
