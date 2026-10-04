@@ -14,8 +14,8 @@ target("miniaudio")
     set_kind("shared")
 
 target("audio_engine")
-    add_includedirs("src/audio_engine", {public = true})
-    add_files("src/audio_engine/*.cpp")
+    add_includedirs("audio_engine", {public = true})
+    add_files("audio_engine/*.cpp")
     set_kind("shared")
     add_includedirs("vendor/voclib")
 
@@ -30,8 +30,8 @@ target("ui")
     add_includedirs("vendor/imgui-node-editor", {public = true})
     add_files("vendor/imgui-node-editor/**.cpp")
 
-    add_includedirs("src/ui")
-    add_files("src/ui/*.cpp")
+    add_includedirs("old_ui")
+    add_files("old_ui/*.cpp")
     set_kind("shared")
     add_packages("imgui", {public = true})
     add_deps("audio_engine")
@@ -42,9 +42,9 @@ target("openvoice")
 
 -- This file is only for testing purposes
    after_build(function (target)
-        os.cp("audio.wav", target:targetdir())
+        os.cp("../../assets/audio.wav", target:targetdir())
     end)
-   add_files("src/main.cpp")
+   add_files("main.cpp")
 
 -- Adding files to compilation
     add_deps("ui")
