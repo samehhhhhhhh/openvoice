@@ -25,5 +25,7 @@ The voice configuration is then stored in a file that is stored in a folder that
 installed on the client. Thus, the user can either acquire his own configuration files or use the built in database
 (Just a repository containing configurations made by the community)
 
-Might use https://avaloniaui.net/ for UI
+Might use https://avaloniaui.net/ for UI // Nevermind
+
+We are using the one, and only, QTTTTT !
 
