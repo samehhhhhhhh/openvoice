@@ -6,15 +6,12 @@
 #define OPENVOICE_NODE_EDITOR_MANAGER_HPP
 
 
-#include <imgui_node_editor.h>
-#include "../audio_engine/node_graph.hpp"
+#include "node_graph.hpp"
 
-
-namespace ed = ax::NodeEditor;
 
 class node_editor_man {
 
-    ed::EditorContext* m_Context = nullptr;
+    
 
     void DrawNode(node* ActiveNode);
 
@@ -32,16 +29,14 @@ class node_editor_man {
 public:
     node_editor_man()
     {
-        ed::Config config;
-        config.SettingsFile = "Simple.json";
-        m_Context = ed::CreateEditor(&config);
+        
     }
 
     void OnFrame(float deltaTime, node_graph& ng);
 
 
     ~node_editor_man() {
-        ed::DestroyEditor(m_Context);
+        
     }
 };
 
