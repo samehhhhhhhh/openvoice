@@ -115,8 +115,11 @@ void node_editor_man::DrawNode(node* ActiveNode)
 {
 
     ed::BeginNode(ActiveNode->ID);
+
+    // Node title
     ImGui::Text(ActiveNode->config.title.c_str());
 
+    // Drawing Pins
     for (int i = 0; i <= max_index(ActiveNode); i++)
     {
         std::pair <pin, pin> a = FindSameIndexPin(ActiveNode, i);
@@ -137,6 +140,17 @@ void node_editor_man::DrawNode(node* ActiveNode)
         }
 
     }
+
+    // Drawing widgets
+    for(const auto& i : ActiveNode->config.widgets) {
+        ImGui::Text(i.label);
+
+        ImGui::SameLine();  
+
+        ImGui::InputFloat(i.label, i.target);
+
+    }
+
     ed::EndNode();
 }
 

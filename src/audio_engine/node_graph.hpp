@@ -28,7 +28,7 @@ class node_graph
     std::vector<link> links;
 
     // I got recommended doing this by people : 
-    std::array<node_descriptor, 4> node_types {{
+    std::array<node_descriptor, 5> node_types {{
         {
             "Vocoder node",
             [](ma_node_graph& graph)
@@ -58,6 +58,14 @@ class node_graph
             [](ma_node_graph& graph)
             {
                 return std::make_unique<endpoint_node>(graph);
+            },
+            false
+        },
+        {
+            "Low Pass Filter Node",
+            [](ma_node_graph& graph)
+            {
+                return std::make_unique<lpf_node>(graph);
             },
             false
         }
@@ -123,7 +131,7 @@ public:
 
     ma_node_graph& get_nodeGraph() { return m_nodeGraph; }
 
-    std::array<node_descriptor, 4> get_node_types() {
+    std::array<node_descriptor, 5> get_node_types() {
         return node_types;
     }
 

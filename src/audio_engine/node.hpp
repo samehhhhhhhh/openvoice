@@ -29,12 +29,28 @@ struct link
     unsigned int input_pin_ID = 0;  // The pin the audio goes into
 };
 
+enum class widget_types 
+{
+    WIDGET_INT_INPUT = 0,
+    WIDGET_FLOAT_INPUT,
+    WIDGET_INT_SLIDER,
+    WIDGET_FLOAT_SLIDER
+};
+
+struct node_widget {
+    widget_types type;
+    const char* label;
+    float* target;
+
+};
 struct node_config
 {
     std::string title = "Untitled node";
     std::string description;
     std::string color;
     std::vector<pin> pins;
+
+    std::vector<node_widget> widgets;
 
     void add_pin(std::string title, std::string description, pin_types type, unsigned int index, unsigned int ID)
     {
@@ -60,10 +76,20 @@ struct node_config
         return nullptr;
     }
 
+
+    /*
+        We're going to make a struct that contains extra inputs for each node. Node config will store an array of those
+        And the draw node method will draw them with those additional widgets inside of them.
+    
+    */
+
 };
 
 class node
 {
+
+// TODO : Make an easy way to push parameter widgets on the nodes 
+
 protected:
     node() = default;
 

@@ -22,6 +22,7 @@
 #define DEVICE_CHANNELS    1               /* For this example, always set to 1. */
 
 
+
 struct vocoder_node : public node
 {
     ma_vocoder_node_config vocoderNodeConfig;
@@ -76,6 +77,12 @@ struct waveform_node : public node
     ma_data_source_node_config sourceNodeConfig;
     ma_data_source_node g_sourceNode;    /* A data source node containing the source data we'll be sending through to the vocoder. This will be routed into the first bus of the vocoder node. */
 
+    float amplitudeva = 60;
+    node_widget amplitude {
+        widget_types::WIDGET_FLOAT_INPUT,
+        "Amplitude",
+        &amplitudeva
+    };
     waveform_node(ma_node_graph &g_nodeGraph)
     {
 
@@ -145,6 +152,43 @@ struct exciter_node : public node
 
 };
 
-// TODO: Endpoint node
+// Low pass filter
+struct lpf_node : public node
+{
+    ma_lpf_node_config lpfConfig;
+    ma_lpf_node         g_sourceData;    /* The underlying data source of the source node. */
+    ma_data_source_node_config sourceNodeConfig;
+    ma_data_source_node g_sourceNode;    /* A data source node containing the source data we'll be sending through to the vocoder. This will be routed into the first bus of the vocoder node. */
+
+    lpf_node(ma_node_graph &g_nodeGraph)
+    {
+
+        config.title = "Low Pass Filter Node";
+        config.description = "A LPF node";
+
+        config.add_pin("Output", "An output brah", pin_types::OUTPUT, 0, id_generator::get_id());
+
+        m_Node = &g_sourceNode;
+
+        lpfConfig = ma_lpf_node_config_init(DEVICE_CHANNELS, SAMPLE_RATE, 6000, 1000);
+
+        result = ma_lpf_node_init(&g_nodeGraph, &lpfConfig,NULL,&g_sourceData);
+        check_result("Failed to initialize waveform.");
+
+        sourceNodeConfig = ma_data_source_node_config_init(&g_sourceData);
+
+        
+        result = ma_data_source_node_init(&g_nodeGraph, &sourceNodeConfig, NULL, &g_sourceNode);
+        // Create an allocation callback with the node graph i guess as pUser ?????
+        check_result("Failed to initialize source node.");
+    }
+
+    ~lpf_node()
+    {
+        ma_data_source_node_uninit(&g_sourceNode, nullptr);
+    }
+
+};
+
 
 #endif //OPENVOICE_NODES_H
