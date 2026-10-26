@@ -8,5 +8,6 @@ compile_commands.json
 cmake-build-debug/
 CMakeFiles
 .idea/
-vendor/
 
+.zed/
+.cache/

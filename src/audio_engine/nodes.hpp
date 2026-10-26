@@ -77,17 +77,28 @@ struct waveform_node : public node
     ma_data_source_node_config sourceNodeConfig;
     ma_data_source_node g_sourceNode;    /* A data source node containing the source data we'll be sending through to the vocoder. This will be routed into the first bus of the vocoder node. */
 
-    float amplitudeva = 60;
-    node_widget amplitude {
+    float frequencyva = 60;
+    node_widget frequency {
         widget_types::WIDGET_FLOAT_INPUT,
-        "Amplitude",
-        &amplitudeva
+        "Frequency",
+        &frequencyva
     };
+
+    void reinitialize(ma_node_graph &g_nodeGraph) override{
+
+
+
+    }
+
+    void update() override {
+        ma_waveform_set_frequency(&g_sourceData, frequencyva);
+    }
     waveform_node(ma_node_graph &g_nodeGraph)
     {
 
         config.title = "Waveform node";
         config.description = "A waveform node";
+        config.widgets.push_back(frequency);
 
         config.add_pin("Output", "An output brah", pin_types::OUTPUT, 0, id_generator::get_id());
 
@@ -103,6 +114,12 @@ struct waveform_node : public node
         // Actual source node for the carrier
         result = ma_data_source_node_init(&g_nodeGraph, &sourceNodeConfig, NULL, &g_sourceNode);
         check_result("Failed to initialize source node.");
+
+        reinitialize(g_nodeGraph);
+        // I forgot this and got stuck for a moment
+        // Peak experience
+
+
     }
 
     ~waveform_node()
@@ -145,6 +162,8 @@ struct exciter_node : public node
         return &g_exciteData;
     }
 
+
+
     ~exciter_node()
     {
         ma_data_source_node_uninit(&g_exciteNode, nullptr);
@@ -177,7 +196,7 @@ struct lpf_node : public node
 
         sourceNodeConfig = ma_data_source_node_config_init(&g_sourceData);
 
-        
+
         result = ma_data_source_node_init(&g_nodeGraph, &sourceNodeConfig, NULL, &g_sourceNode);
         // Create an allocation callback with the node graph i guess as pUser ?????
         check_result("Failed to initialize source node.");

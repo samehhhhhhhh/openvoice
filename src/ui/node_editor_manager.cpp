@@ -11,43 +11,38 @@ void node_editor_man::OnFrame(float deltaTime, node_graph& ng) {
 
     ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
 
+    if (ImGui::Button("Create node"))
+        ImGui::OpenPopup("nodes");
+    node* selected_node = nullptr;
+    if(ImGui::BeginPopup("nodes"))
+    {
+
+        ImGui::SeparatorText("Available nodes : ");
+
+        for(auto const & i : ng.get_node_types())
+
+            if(ImGui::Selectable(i.title))
+                ng.add_node(i);
+
+        ImGui::EndPopup();
+
+    }
+
+    if(ImGui::Button("Recompile Nodes")) {
+        ng.recompile_nodes();
+    }
+
+    if(ImGui::Button("Update Nodes")) {
+        ng.update_nodes();
+    }
+
     ImGui::Separator();
 
     auto paneWidth = ImGui::GetContentRegionAvail().x;
 
     ed::SetCurrentEditor(m_Context);
 
-    // Button position relative to the screen coordinate of the editor canvas 
-    auto pos = ImGui::GetCursorScreenPos();
-    pos.x += 10.0f;
-    pos.y += 10.0f;
-
-
     ed::Begin("My Editor", ImVec2(0.0, 0.0f));
-    
-    ed::Suspend();
-    // Create at top left the create node button.
-    
-    ImGui::SetCursorScreenPos(pos);
-
-    if (ImGui::Button("Create node"))
-        ImGui::OpenPopup("nodes");
-    node* selected_node = nullptr;
-    if(ImGui::BeginPopup("nodes"))
-    {
-        
-        ImGui::SeparatorText("Available nodes : ");
-        
-        for(auto const & i : ng.get_node_types())
-            
-            if(ImGui::Selectable(i.title))
-                ng.add_node(i); 
-                
-        ImGui::EndPopup();
-        
-    }
-
-    ed::Resume();
 
     const auto& graph_nodes {ng.get_active_nodes()};
 
@@ -143,9 +138,6 @@ void node_editor_man::DrawNode(node* ActiveNode)
 
     // Drawing widgets
     for(const auto& i : ActiveNode->config.widgets) {
-        ImGui::Text(i.label);
-
-        ImGui::SameLine();  
 
         ImGui::InputFloat(i.label, i.target);
 

@@ -124,7 +124,7 @@ unsigned int node_graph::add_link(const unsigned int pin_a_ID, const unsigned in
     return new_link.ID;
 }
 
-void node_graph::remove_link(const unsigned int link_ID)
+void node_graph::remove_link(const unsigned int link_ID,const bool remove)
 {
     for (auto it = links.begin(); it != links.end(); ++it)
     {
@@ -138,7 +138,8 @@ void node_graph::remove_link(const unsigned int link_ID)
             source_node->DetachFrom(output_pin->index);
         }
 
-        links.erase(it);
+        if(remove) links.erase(it);
+
         return;
     }
 

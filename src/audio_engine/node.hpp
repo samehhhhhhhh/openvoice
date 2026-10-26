@@ -29,7 +29,7 @@ struct link
     unsigned int input_pin_ID = 0;  // The pin the audio goes into
 };
 
-enum class widget_types 
+enum class widget_types
 {
     WIDGET_INT_INPUT = 0,
     WIDGET_FLOAT_INPUT,
@@ -80,7 +80,7 @@ struct node_config
     /*
         We're going to make a struct that contains extra inputs for each node. Node config will store an array of those
         And the draw node method will draw them with those additional widgets inside of them.
-    
+
     */
 
 };
@@ -88,7 +88,7 @@ struct node_config
 class node
 {
 
-// TODO : Make an easy way to push parameter widgets on the nodes 
+// TODO : Make an easy way to push parameter widgets on the nodes
 
 protected:
     node() = default;
@@ -99,31 +99,40 @@ public :
 
     node_config config;
     unsigned int ID;
-    void AttachTo(const unsigned int OutputBus, ma_node* target_node, const unsigned int TargetBus) const
-{
-    result = ma_node_attach_output_bus(m_Node, OutputBus, target_node, TargetBus);
 
+    void AttachTo(const unsigned int OutputBus, ma_node* target_node, const unsigned int TargetBus) const {
+
+    result = ma_node_attach_output_bus(m_Node, OutputBus, target_node, TargetBus);
     check_result("Failed to attach vocoder output bus");
-}
+
+    }
 
     void AttachTo(const unsigned int OutputBus, const node& target_node, const unsigned int TargetBus) const
-{
+    {
     result = ma_node_attach_output_bus(m_Node, OutputBus, target_node.m_Node, TargetBus);
     check_result("Failed to attach vocoder output bus");
-}
+    }
 
     /* Undoes an AttachTo on the given output bus. */
     void DetachFrom(const unsigned int OutputBus) const
-{
+    {
     result = ma_node_detach_output_bus(m_Node, OutputBus);
     check_result("Failed to detach node output bus");
-}
+    }
 
     void SetOutputBusVolume(const unsigned int OutputBus,const float volume) const
-{
+    {
     result = ma_node_set_output_bus_volume(m_Node, OutputBus, volume);
     check_result("Failed to set node output bus volume");
-}
+    }
+
+    virtual void reinitialize(ma_node_graph &g_nodeGraph) {
+
+    }
+
+    virtual void update() {
+
+    }
 
     virtual ma_audio_buffer_ref* get_audiobuffer() {
         return nullptr;

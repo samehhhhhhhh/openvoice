@@ -1,5 +1,6 @@
 
 add_rules("mode.debug", "mode.release")
+set_defaultmode("debug")
 
 -- Packages required for the project
 add_requires("imgui", {configs = {glfw_opengl3 = true}})
@@ -44,10 +45,10 @@ target("openvoice")
    after_build(function (target)
         os.cp("audio.wav", target:targetdir())
     end)
-   add_files("src/main.cpp")
 
 -- Adding files to compilation
+    add_files("src/main.cpp")
+    
     add_deps("ui")
     set_kind("binary")
-
 

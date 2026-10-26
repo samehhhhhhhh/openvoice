@@ -5,6 +5,7 @@
 #include "miniaudio.h"
 #include <memory>
 #include "nodes.hpp"
+
 #include <array>
 #include <functional>
 struct node_descriptor
@@ -27,7 +28,7 @@ class node_graph
     // Every connection that currently exists in the graph. The UI draws these.
     std::vector<link> links;
 
-    // I got recommended doing this by people : 
+    // I got recommended doing this by people :
     std::array<node_descriptor, 5> node_types {{
         {
             "Vocoder node",
@@ -87,8 +88,8 @@ public:
         const ma_node_graph_config nodeGraphConfig = ma_node_graph_config_init(DEVICE_CHANNELS);
 
         result = ma_node_graph_init(&nodeGraphConfig, nullptr, &m_nodeGraph);
-        check_result("Failed to initialize node graph config");    
-        
+        check_result("Failed to initialize node graph config");
+
         add_node(node_types[EXCITER_NODE]);
         add_node(node_types[ENDPOINT_NODE]);
 
@@ -103,7 +104,48 @@ public:
 
     }
 
-    
+    // Just running the reinitialize function of every node // Broken btw but too lazy to fix
+    void recompile_nodes() {
+
+        // Removing all links between nodes
+
+        for(auto const& i : links) {
+            remove_link(i.ID, false);
+        }
+
+        // Reinitializing all nodes
+        for(auto const& i : active_nodes) {
+            if(i != nullptr) {
+                i->reinitialize(m_nodeGraph);
+            }
+
+        }
+
+        // Reapplying all links
+        for(const auto& i : links) {
+
+
+            node* m_Node = find_node_by_pin(i.output_pin_ID);
+
+            node* target_node = find_node_by_pin(i.input_pin_ID);
+
+            unsigned int input_pin_index = target_node->config.find_pin_by_id(i.input_pin_ID)->index;
+
+            unsigned int output_pin_index = m_Node->config.find_pin_by_id(i.output_pin_ID)->index;
+
+            m_Node->AttachTo(output_pin_index, &target_node, input_pin_index);
+        }
+
+    }
+
+    void update_nodes() {
+        for(auto const& i : active_nodes) {
+            if(i != nullptr) {
+                i->update();
+            }
+
+        }
+    }
 
     // Basically just adding a pointer to a node into the array
     void add_node(node_descriptor target_node);
@@ -123,7 +165,7 @@ public:
     unsigned int add_link(unsigned int pin_a_ID, unsigned int pin_b_ID);
 
     // Removes the link from the list and detaches the output bus it was using
-    void remove_link(unsigned int link_ID);
+    void remove_link(unsigned int link_ID, const bool remove = true);
 
     const std::vector<link>& get_links() const { return links; }
 
