@@ -3,8 +3,6 @@
 //
 
 #include "node_editor_manager.hpp"
-#include <algorithm>
-#include <functional>
 
 void node_editor_man::OnFrame(float deltaTime, node_graph& ng) {
     auto& io = ImGui::GetIO();
@@ -111,8 +109,42 @@ void node_editor_man::DrawNode(node* ActiveNode)
 
     ed::BeginNode(ActiveNode->ID);
 
-    // Node title
-    ImGui::Text(ActiveNode->config.title.c_str());
+    // Header dimensions
+    const float header_height = 30.0f;
+    const float padding = 10.0f;
+
+    // Measure the title
+    ImVec2 textSize = ImGui::CalcTextSize(ActiveNode->config.title.c_str());
+
+    // Get the starting position
+    ImVec2 pos = ImGui::GetCursorScreenPos();
+
+    // Use the available node width if you have one; otherwise,
+    // this example sizes the header based on the title.
+    float header_width = textSize.x + padding * 4.0f;
+
+    ImVec2 headerMin = pos;
+    ImVec2 headerMax(
+        headerMin.x + header_width,
+        headerMin.y + header_height
+    );
+
+    // Position and draw the title
+    ImGui::SetCursorScreenPos(
+        ImVec2(
+            headerMin.x + padding,
+            headerMin.y + (header_height - textSize.y) * 0.5f
+        )
+    );
+
+    ImGui::TextUnformatted(ActiveNode->config.title.c_str());
+
+    // Reserve space so the node's next content starts below the header
+    ImGui::SetCursorScreenPos(
+        ImVec2(headerMin.x, headerMin.y + header_height)
+    );
+
+    ImGui::Dummy(ImVec2(header_width, 0.0f));
 
     // Drawing Pins
     for (int i = 0; i <= max_index(ActiveNode); i++)
@@ -139,11 +171,23 @@ void node_editor_man::DrawNode(node* ActiveNode)
     // Drawing widgets
     for(const auto& i : ActiveNode->config.widgets) {
 
+        ImGui::SetNextItemWidth(120.0f);
         ImGui::InputFloat(i.label, i.target);
 
     }
 
     ed::EndNode();
+
+    // Draw the background behind the node contents
+    if (ImDrawList* drawList = ed::GetNodeBackgroundDrawList(ActiveNode->ID))
+    {
+        drawList->AddRectFilled(
+            headerMin,
+            headerMax,
+            IM_COL32(60, 140, 220, 255),
+            5.0f
+        );
+    }
 }
 
 void node_editor_man::DrawLinks(const node_graph& ng)
