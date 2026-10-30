@@ -175,49 +175,38 @@ struct exciter_node : public node
 struct lpf_node : public node
 {
     ma_lpf_node_config lpfConfig;
-    ma_lpf_node         g_sourceData;    /* The underlying data source of the source node. */
-    ma_data_source_node_config sourceNodeConfig;
-    ma_data_source_node g_sourceNode;    /* A data source node containing the source data we'll be sending through to the vocoder. This will be routed into the first bus of the vocoder node. */
+    ma_lpf_node         g_filter;
     float cutoff = 6000.0f;
-    float order = 1000.0f;
+    float order = 8.0f;
     node_widget cutoff_widget {widget_types::WIDGET_FLOAT_INPUT, "Cutoff", &cutoff};
     node_widget order_widget {widget_types::WIDGET_FLOAT_INPUT, "Order", &order};
 
-    lpf_node(ma_node_graph &g_nodeGraph)
+    lpf_node(ma_node_graph& graph)
     {
-
         config.title = "Low Pass Filter Node";
-        config.description = "A LPF node";
+        config.description = "Reduces high frequencies.";
         config.widgets.push_back(cutoff_widget);
         config.widgets.push_back(order_widget);
 
-        config.add_pin("Output", "An output brah", pin_types::OUTPUT, 0, id_generator::get_id());
-
-        m_Node = &g_sourceNode;
+        config.add_pin("Input", "Audio input", pin_types::INPUT, 0, id_generator::get_id());
+        config.add_pin("Output", "Filtered audio", pin_types::OUTPUT, 0, id_generator::get_id());
 
         lpfConfig = ma_lpf_node_config_init(DEVICE_CHANNELS, SAMPLE_RATE, cutoff, order);
-
-        result = ma_lpf_node_init(&g_nodeGraph, &lpfConfig,NULL,&g_sourceData);
-        check_result("Failed to initialize waveform.");
-
-        sourceNodeConfig = ma_data_source_node_config_init(&g_sourceData);
-
-
-        result = ma_data_source_node_init(&g_nodeGraph, &sourceNodeConfig, NULL, &g_sourceNode);
-        // Create an allocation callback with the node graph i guess as pUser ?????
-        check_result("Failed to initialize source node.");
+        result = ma_lpf_node_init(&graph, &lpfConfig, nullptr, &g_filter);
+        check_result("Failed to initialize low-pass filter");
+        m_Node = reinterpret_cast<ma_node*>(&g_filter);
     }
 
     ~lpf_node()
     {
-        ma_data_source_node_uninit(&g_sourceNode, nullptr);
+        ma_lpf_node_uninit(&g_filter, nullptr);
     }
 
     void update() override
     {
         const auto config = ma_lpf_config_init(ma_format_f32, DEVICE_CHANNELS, SAMPLE_RATE,
-                                               cutoff, static_cast<ma_uint32>(order));
-        result = ma_lpf_node_reinit(&config, &g_sourceData);
+                                               cutoff, static_cast<ma_uint32>(order < 1.0f ? 1.0f : order));
+        result = ma_lpf_node_reinit(&config, &g_filter);
         check_result("Failed to update low-pass filter");
     }
 

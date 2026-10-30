@@ -41,7 +41,7 @@ struct node_widget {
     widget_types type;
     const char* label;
     float* target;
-
+    unsigned int ID = id_generator::get_id();
 };
 struct node_config
 {

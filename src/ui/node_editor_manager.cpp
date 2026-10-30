@@ -169,10 +169,12 @@ void node_editor_man::DrawNode(node* ActiveNode)
     }
 
     // Drawing widgets
-    for(const auto& i : ActiveNode->config.widgets) {
+    for (const auto& i : ActiveNode->config.widgets) {
 
         ImGui::SetNextItemWidth(120.0f);
+        ImGui::PushID(static_cast<int>(i.ID));
         ImGui::InputFloat(i.label, i.target);
+        ImGui::PopID();
 
     }
 
