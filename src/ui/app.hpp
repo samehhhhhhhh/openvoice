@@ -3,6 +3,7 @@
 #ifndef OPENVOICE_APP_H
 #define OPENVOICE_APP_H
 #include <GLFW/glfw3.h>
+#include <GL/gl.h>
 #include "engine.hpp"
 #include "device_manager.hpp"
 #include <imgui.h>

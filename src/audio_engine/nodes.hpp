@@ -220,7 +220,7 @@ enum class basic_operation
     MIX,
     MULTIPLY,
     CLAMP,
-    ABSOLUTE,
+    ABSOLUTE_VAL, // For some reason, the preprocessor on windows (using MinGW) replaces ABSOLUTE
     EXPRESSION
 };
 
@@ -276,7 +276,7 @@ struct basic_dsp_node : public node
                     value = first < state->minimum ? state->minimum :
                             (first > state->maximum ? state->maximum : first);
                     break;
-                case basic_operation::ABSOLUTE:
+                case basic_operation::ABSOLUTE_VAL:
                     value = first < 0.0f ? -first : first;
                     break;
                 case basic_operation::EXPRESSION:
@@ -411,7 +411,7 @@ struct absolute_value_node : public basic_dsp_node
 {
     explicit absolute_value_node(ma_node_graph& graph)
         : basic_dsp_node(graph, "Absolute Value", "Make negative samples positive.",
-                         basic_operation::ABSOLUTE) {}
+                         basic_operation::ABSOLUTE_VAL) {}
 };
 
 struct math_expression_node : public basic_dsp_node
