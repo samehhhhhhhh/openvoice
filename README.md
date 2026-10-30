@@ -1,7 +1,7 @@
 
 # OpenVoice
 
-![A node editor](images/image.png)
+![A node editor](images/phone_voice_setup.gif)
 
 Description : 
 
