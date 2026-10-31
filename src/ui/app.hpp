@@ -2,13 +2,12 @@
 
 #ifndef OPENVOICE_APP_H
 #define OPENVOICE_APP_H
-#include <GLFW/glfw3.h>
-#include <GL/gl.h>
+#include <SDL3/SDL.h>
 #include "engine.hpp"
 #include "device_manager.hpp"
 #include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl3.h>
+#include <imgui_impl_sdlrenderer3.h>
 
 #include "node_editor_manager.hpp"
 
@@ -28,8 +27,8 @@ public:
 private:
 
     // variables :
-    GLFWwindow* window = nullptr;
-    const char* glslVersion = nullptr;
+    SDL_Window* window = nullptr;
+    SDL_Renderer* renderer = nullptr;
 
 
     bool nodeEditorOpen = false;

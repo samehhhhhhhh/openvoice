@@ -3,38 +3,33 @@
 
 App::App() {
 
-    glfwInit();
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
+        std::cerr << "SDL_Init failed: " << SDL_GetError() << "\n";
+        std::exit(1);
+    }
 
-#if defined(__APPLE__)
-
-    glslVersion = "#version 150";
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
-#else
-
-    glslVersion = "#version 130";
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
-#endif
-
-    const float mainScale =
-            ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor());
-
-    window = glfwCreateWindow(
-        static_cast<int>(1280 * mainScale),
-        static_cast<int>(800 * mainScale),
+    window = SDL_CreateWindow(
         "OpenVoice",
-        nullptr,
-        nullptr);
+        1280,
+        800,
+        SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+    if (!window) {
+        std::cerr << "SDL_CreateWindow failed: " << SDL_GetError() << "\n";
+        SDL_Quit();
+        std::exit(1);
+    }
 
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
+    renderer = SDL_CreateRenderer(window, nullptr);
+    if (!renderer) {
+        std::cerr << "SDL_CreateRenderer failed: " << SDL_GetError() << "\n";
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        std::exit(1);
+    }
+
+    SDL_SetRenderVSync(renderer, 1);
+
+    const float mainScale = SDL_GetWindowDisplayScale(window);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -50,21 +45,21 @@ App::App() {
     style.ScaleAllSizes(mainScale);
     style.FontScaleDpi = mainScale;
 
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init(glslVersion);
-
+    ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
+    ImGui_ImplSDLRenderer3_Init(renderer);
 
 }
 
 
 App::~App()
 {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
+    ImGui_ImplSDLRenderer3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 }
 
 void App::renderHomePage() {
@@ -155,18 +150,25 @@ void App::run()
 {
 
 
-    while (!glfwWindowShouldClose(window))
+    bool running = true;
+    SDL_Event event;
+    while (running)
     {
-        glfwPollEvents();
+        while (SDL_PollEvent(&event)) {
+            ImGui_ImplSDL3_ProcessEvent(&event);
+            if (event.type == SDL_EVENT_QUIT) {
+                running = false;
+            }
+        }
 
-        if (glfwGetWindowAttrib(window, GLFW_ICONIFIED))
+        if ((SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED) != 0)
         {
-            ImGui_ImplGlfw_Sleep(10);
+            SDL_Delay(10);
             continue;
         }
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
+        ImGui_ImplSDLRenderer3_NewFrame();
+        ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
 
         #ifdef IMGUI_HAS_VIEWPORT
@@ -192,23 +194,15 @@ void App::run()
 
         ImGui::Render();
 
-        int displayW, displayH;
-        glfwGetFramebufferSize(window, &displayW, &displayH);
-
-        glViewport(0, 0, displayW, displayH);
-
-        glClearColor(
-            clearColor.x * clearColor.w,
-            clearColor.y * clearColor.w,
-            clearColor.z * clearColor.w,
-            clearColor.w);
-
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        glfwSwapBuffers(window);
+        SDL_SetRenderDrawColor(
+            renderer,
+            static_cast<Uint8>(clearColor.x * clearColor.w * 255.0f),
+            static_cast<Uint8>(clearColor.y * clearColor.w * 255.0f),
+            static_cast<Uint8>(clearColor.z * clearColor.w * 255.0f),
+            static_cast<Uint8>(clearColor.w * 255.0f));
+        SDL_RenderClear(renderer);
+        ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
+        SDL_RenderPresent(renderer);
     }
 
 }
-
