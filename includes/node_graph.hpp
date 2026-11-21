@@ -53,7 +53,7 @@ class node_graph
             true
         },
         {
-            "Exciter node",
+            "Input node",
             [](ma_node_graph& graph) -> std::shared_ptr<node>
             {
                 return std::make_shared<exciter_node>(graph);
@@ -69,7 +69,7 @@ class node_graph
             true
         },
         {
-            "Endpoint node",
+            "Output node",
             [](ma_node_graph& graph) -> std::shared_ptr<node>
             {
                 return std::make_shared<endpoint_node>(graph);

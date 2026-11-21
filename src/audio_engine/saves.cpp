@@ -41,7 +41,7 @@ void save_manager::save(std::string& filepath, voice_descriptor& voice_descripti
         for(auto& a : voice_description.links) {
 
             file << a.input_node_index << " " << a.output_node_index
-                << " " << a.input_pin_index << " " << a.output_pin_index << std::endl;
+                << " " << a.output_pin_index << " " << a.input_pin_index << std::endl;
 
             // Basically one line per link, using the index of the element in the active_nodes array to
             // As a way to reconstruct the links
