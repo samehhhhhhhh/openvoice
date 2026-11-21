@@ -113,7 +113,7 @@ unsigned int node_graph::add_link(const unsigned int pin_a_ID, const unsigned in
             return ptr.get() == source_node;
         });
 
-    int source_node_index = std::distance(active_nodes.begin(), source_node_iterator);
+    unsigned int source_node_index = std::distance(active_nodes.begin(), source_node_iterator);
 
     auto target_node_iterator = std::find_if(
         active_nodes.begin(),
@@ -122,7 +122,7 @@ unsigned int node_graph::add_link(const unsigned int pin_a_ID, const unsigned in
             return ptr.get() == target_node;
         });
 
-    int target_node_index = std::distance(active_nodes.begin(), target_node_iterator);
+    unsigned int target_node_index = std::distance(active_nodes.begin(), target_node_iterator);
 
     const link new_link {.input_node_index = source_node_index,
                         .output_node_index = target_node_index,

@@ -18,7 +18,7 @@ target("miniaudio")
     set_kind("static")
 
 target("audio_engine")
-    add_includedirs("includes", {public = true})
+    add_includedirs("includes")
     add_files("src/audio_engine/*.cpp")
     set_kind("static")
     add_includedirs("vendor/voclib")

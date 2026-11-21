@@ -6,12 +6,10 @@
 
 #include "miniaudio.h"
 #include "nodes.hpp"
-
 #include <memory>
 #include <array>
 #include <functional>
 #include <algorithm>
-
 
 struct voice_descriptor
 {
