@@ -3,7 +3,8 @@
 //
 
 #include "node_editor_manager.hpp"
-
+#include "saves.hpp"
+#include <imgui_stdlib.h>
 void node_editor_man::OnFrame(float deltaTime, node_graph& ng) {
     auto& io = ImGui::GetIO();
 
@@ -32,6 +33,67 @@ void node_editor_man::OnFrame(float deltaTime, node_graph& ng) {
 
     if(ImGui::Button("Update Nodes")) {
         ng.update_nodes();
+    }
+
+    if(ImGui::Button("Save Voice")) {
+        ImGui::OpenPopup("Save Voice");
+
+
+
+    }
+
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+    if (ImGui::BeginPopupModal("Save Voice", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        // Making the variables static so they don't get redefined at each frame
+        static std::string voicename = "default";
+        ImGui::Text("Name : ");
+        ImGui::SameLine();
+        ImGui::InputText("Voice Name", &voicename);
+        ImGui::Separator();
+
+        static std::string description = "default";
+        ImGui::Text("Description : ");
+        ImGui::SameLine();
+        ImGui::InputText("Voice Description", &description);
+        ImGui::Separator();
+
+        static std::string version = "V.0.0.1";
+        ImGui::Text("version : ");
+        ImGui::SameLine();
+        ImGui::InputText("Made for openvoice version : ", &version);
+        ImGui::Separator();
+
+        static std::string authour = "default";
+        ImGui::Text("authour : ");
+        ImGui::SameLine();
+        ImGui::InputText("Voice Authour", &authour);
+        ImGui::Separator();
+
+        if(ImGui::Button("Save")) {
+
+            voice_descriptor voice {
+                voicename,
+                version,
+                authour,
+                &ng.get_active_nodes(),
+                ng.get_links()
+            };
+            voicename = "voices/" + voicename + ".conf";
+            save_manager::save(voicename, voice);
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if(ImGui::Button("Cancel")) {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    if(ImGui::Button("Load Voice")) {
+        // Should open a selector with all available voices
     }
 
     ImGui::Separator();

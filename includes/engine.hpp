@@ -2,7 +2,7 @@
 #define OPENVOICE_ENGINE_H
 #include <memory>
 
-#include "../shared/includes.hpp"
+
 #include "nodes.hpp"
 #include "node_graph.hpp"
 
@@ -63,7 +63,7 @@ public :
 
     engine() {
 
-    
+
         init_device();
         // Miniaudio engine initialization for generic sound playing
         engineConfig = ma_engine_config_init();
@@ -88,7 +88,7 @@ public :
     void set_dev(ma_device_id* deviceInfo, device_type type ) {
 
         ma_device_stop(&device);
-        
+
         if (type == DEVICE_CAPTURE) {
             CaptureDeviceID = deviceInfo;
         } else if (type == DEVICE_PLAYBACK){
@@ -100,7 +100,7 @@ public :
         }
 
         init_device();
-        
+
     }
 };
 

@@ -8,8 +8,18 @@
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlrenderer3.h>
-
+#include <filesystem>
 #include "node_editor_manager.hpp"
+#include <string>
+#include <fstream>
+#include "saves.hpp"
+
+using namespace std::filesystem;
+
+struct voice_desc {
+    std::string name;
+    std::string authour;
+};
 
 class App
 {
@@ -36,6 +46,8 @@ private:
     ImVec4 clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     void renderHomePage();
     void renderNodeEditor();
+
+
 
 };
 

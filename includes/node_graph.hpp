@@ -2,28 +2,42 @@
 #ifndef OPENVOICE_NODE_GRAPH_HPP
 #define OPENVOICE_NODE_GRAPH_HPP
 
+#define OPENVOICE_VERSION "0.0.1-beta"
+
 #include "miniaudio.h"
-#include <memory>
 #include "nodes.hpp"
 
+#include <memory>
 #include <array>
 #include <functional>
+#include <algorithm>
+
+
+struct voice_descriptor
+{
+    std::string name;
+    std::string version;
+    std::string author;
+    std::vector<std::shared_ptr<node>>* nodes;
+    std::vector<link> links;
+
+};
 struct node_descriptor
 {
     const char* title;
-    std::function<std::unique_ptr<node>(ma_node_graph&)> create;
+    std::function<std::shared_ptr<node>(ma_node_graph&)> create;
     bool ispublic;
+
+
 };
-
-
 class node_graph
 {
 
     ma_node_graph m_nodeGraph;
 
-    // TODO: Change this from a raw value to a variable that can be set
-    // btw : index of element is the ui ID.
-    std::array<std::unique_ptr<node>, 20> active_nodes {nullptr};
+
+    // This will eat alot of memory if we keep it a vector
+    std::vector<std::shared_ptr<node>> active_nodes;
 
     // Every connection that currently exists in the graph. The UI draws these.
     std::vector<link> links;
@@ -32,232 +46,232 @@ class node_graph
     std::array<node_descriptor, 43> node_types {{
         {
             "Vocoder node",
-            [](ma_node_graph& graph)
+            [](ma_node_graph& graph) -> std::shared_ptr<node>
             {
-                return std::make_unique<vocoder_node>(graph);
+                return std::make_shared<vocoder_node>(graph);
             },
             true
         },
         {
             "Exciter node",
-            [](ma_node_graph& graph)
+            [](ma_node_graph& graph) -> std::shared_ptr<node>
             {
-                return std::make_unique<exciter_node>(graph);
+                return std::make_shared<exciter_node>(graph);
             },
             false
         },
         {
             "WaveForm node",
-            [](ma_node_graph& graph)
+            [](ma_node_graph& graph) -> std::shared_ptr<node>
             {
-                return std::make_unique<waveform_node>(graph);
+                return std::make_shared<waveform_node>(graph);
             },
             true
         },
         {
             "Endpoint node",
-            [](ma_node_graph& graph)
+            [](ma_node_graph& graph) -> std::shared_ptr<node>
             {
-                return std::make_unique<endpoint_node>(graph);
+                return std::make_shared<endpoint_node>(graph);
             },
             false
         },
         {
             "Low Pass Filter Node",
-            [](ma_node_graph& graph)
+            [](ma_node_graph& graph) -> std::shared_ptr<node>
             {
-                return std::make_unique<lpf_node>(graph);
+                return std::make_shared<lpf_node>(graph);
             },
             false
         },
         {
             "Gain / Volume",
-            [](ma_node_graph& graph) { return std::make_unique<gain_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<gain_node>(graph); },
             true
         },
         {
             "Invert",
-            [](ma_node_graph& graph) { return std::make_unique<invert_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<invert_node>(graph); },
             true
         },
         {
             "Offset",
-            [](ma_node_graph& graph) { return std::make_unique<offset_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<offset_node>(graph); },
             true
         },
         {
             "Add / Mix",
-            [](ma_node_graph& graph) { return std::make_unique<add_mix_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<add_mix_node>(graph); },
             true
         },
         {
             "Multiply",
-            [](ma_node_graph& graph) { return std::make_unique<multiply_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<multiply_node>(graph); },
             true
         },
         {
             "Clamp",
-            [](ma_node_graph& graph) { return std::make_unique<clamp_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<clamp_node>(graph); },
             true
         },
         {
             "Absolute Value",
-            [](ma_node_graph& graph) { return std::make_unique<absolute_value_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<absolute_value_node>(graph); },
             true
         },
         {
             "Math Expression",
-            [](ma_node_graph& graph) { return std::make_unique<math_expression_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<math_expression_node>(graph); },
             true
         },
         {
             "High-pass Filter",
-            [](ma_node_graph& graph) { return std::make_unique<high_pass_filter_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<high_pass_filter_node>(graph); },
             true
         },
         {
             "Band-pass Filter",
-            [](ma_node_graph& graph) { return std::make_unique<band_pass_filter_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<band_pass_filter_node>(graph); },
             true
         },
         {
             "Notch Filter",
-            [](ma_node_graph& graph) { return std::make_unique<notch_filter_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<notch_filter_node>(graph); },
             true
         },
         {
             "Parametric EQ",
-            [](ma_node_graph& graph) { return std::make_unique<parametric_eq_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<parametric_eq_node>(graph); },
             true
         },
         {
             "Resonant Filter",
-            [](ma_node_graph& graph) { return std::make_unique<resonant_filter_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<resonant_filter_node>(graph); },
             true
         },
         {
             "Filter Bank",
-            [](ma_node_graph& graph) { return std::make_unique<filter_bank_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<filter_bank_node>(graph); },
             true
         },
         {
             "Compressor",
-            [](ma_node_graph& graph) { return std::make_unique<compressor_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<compressor_node>(graph); },
             true
         },
         {
             "Limiter",
-            [](ma_node_graph& graph) { return std::make_unique<limiter_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<limiter_node>(graph); },
             true
         },
         {
             "Noise Gate",
-            [](ma_node_graph& graph) { return std::make_unique<noise_gate_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<noise_gate_node>(graph); },
             true
         },
         {
             "Envelope Follower",
-            [](ma_node_graph& graph) { return std::make_unique<envelope_follower_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<envelope_follower_node>(graph); },
             true
         },
         {
             "Auto Gain",
-            [](ma_node_graph& graph) { return std::make_unique<auto_gain_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<auto_gain_node>(graph); },
             true
         },
         {
             "Fade / Ramp",
-            [](ma_node_graph& graph) { return std::make_unique<fade_ramp_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<fade_ramp_node>(graph); },
             true
         },
         {
             "Delay",
-            [](ma_node_graph& graph) { return std::make_unique<delay_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<delay_node>(graph); },
             true
         },
         {
             "Feedback Delay",
-            [](ma_node_graph& graph) { return std::make_unique<feedback_delay_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<feedback_delay_node>(graph); },
             true
         },
         {
             "Reverb",
-            [](ma_node_graph& graph) { return std::make_unique<reverb_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<reverb_node>(graph); },
             true
         },
         {
             "Chorus",
-            [](ma_node_graph& graph) { return std::make_unique<chorus_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<chorus_node>(graph); },
             true
         },
         {
             "Flanger",
-            [](ma_node_graph& graph) { return std::make_unique<flanger_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<flanger_node>(graph); },
             true
         },
         {
             "Phaser",
-            [](ma_node_graph& graph) { return std::make_unique<phaser_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<phaser_node>(graph); },
             true
         },
         {
             "Soft Clip / Saturation",
-            [](ma_node_graph& graph) { return std::make_unique<soft_clip_saturation_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<soft_clip_saturation_node>(graph); },
             true
         },
         {
             "Hard Clip",
-            [](ma_node_graph& graph) { return std::make_unique<hard_clip_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<hard_clip_node>(graph); },
             true
         },
         {
             "Waveshaper",
-            [](ma_node_graph& graph) { return std::make_unique<waveshaper_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<waveshaper_node>(graph); },
             true
         },
         {
             "Bit Crusher",
-            [](ma_node_graph& graph) { return std::make_unique<bit_crusher_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<bit_crusher_node>(graph); },
             true
         },
         {
             "Rectifier",
-            [](ma_node_graph& graph) { return std::make_unique<rectifier_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<rectifier_node>(graph); },
             true
         },
         {
             "Ring Modulator",
-            [](ma_node_graph& graph) { return std::make_unique<ring_modulator_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<ring_modulator_node>(graph); },
             true
         },
         {
             "Pitch Shifter",
-            [](ma_node_graph& graph) { return std::make_unique<pitch_shifter_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<pitch_shifter_node>(graph); },
             true
         },
         {
             "Frequency Shifter",
-            [](ma_node_graph& graph) { return std::make_unique<frequency_shifter_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<frequency_shifter_node>(graph); },
             true
         },
         {
             "Pitch Detector",
-            [](ma_node_graph& graph) { return std::make_unique<pitch_detector_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<pitch_detector_node>(graph); },
             true
         },
         {
             "Harmonizer",
-            [](ma_node_graph& graph) { return std::make_unique<harmonizer_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<harmonizer_node>(graph); },
             true
         },
         {
             "Vocoder",
-            [](ma_node_graph& graph) { return std::make_unique<vocoder_effect_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<vocoder_effect_node>(graph); },
             true
         },
         {
             "Time Stretcher",
-            [](ma_node_graph& graph) { return std::make_unique<time_stretcher_node>(graph); },
+            [](ma_node_graph& graph) -> std::shared_ptr<node> { return std::make_shared<time_stretcher_node>(graph); },
             true
         }
     }};
@@ -338,10 +352,10 @@ public:
     }
 
     // Basically just adding a pointer to a node into the array
-    void add_node(node_descriptor target_node);
+    std::shared_ptr<node> add_node(node_descriptor target_node);
 
     // Looks in the array for the node, when found sets it to nullptr
-    void remove_node(std::unique_ptr<node> target_node);
+    void remove_node(std::shared_ptr<node> target_node);
 
     // Returns the node owning the given pin, nullptr when no active node has it
     node* find_node_by_pin(unsigned int pin_ID);
@@ -359,7 +373,7 @@ public:
 
     const std::vector<link>& get_links() const { return links; }
 
-    std::array<std::unique_ptr<node>, 20>& get_active_nodes() { return active_nodes; }
+    std::vector<std::shared_ptr<node>>& get_active_nodes() { return active_nodes; }
 
     ma_node_graph& get_nodeGraph() { return m_nodeGraph; }
 

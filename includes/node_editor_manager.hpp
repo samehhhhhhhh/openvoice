@@ -7,7 +7,7 @@
 
 
 #include <imgui_node_editor.h>
-#include "../audio_engine/node_graph.hpp"
+#include "node_graph.hpp"
 
 
 namespace ed = ax::NodeEditor;

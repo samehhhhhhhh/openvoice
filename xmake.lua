@@ -18,7 +18,7 @@ target("miniaudio")
     set_kind("static")
 
 target("audio_engine")
-    add_includedirs("src/audio_engine", {public = true})
+    add_includedirs("includes", {public = true})
     add_files("src/audio_engine/*.cpp")
     set_kind("static")
     add_includedirs("vendor/voclib")
@@ -33,7 +33,7 @@ target("ui")
     add_includedirs("vendor/imgui-node-editor", {public = true})
     add_files("vendor/imgui-node-editor/**.cpp")
 
-    add_includedirs("src/ui")
+    add_includedirs("includes", {public = true})
     add_files("src/ui/*.cpp")
     set_kind("static")
     add_packages("imgui", {public = true})
@@ -49,16 +49,16 @@ target("openvoice")
 
 -- Adding files to compilation
     add_files("src/main.cpp")
-    
+
     add_deps("ui")
     set_kind("binary")
 
     if is_plat("mingw") then
     add_ldflags("-static", "-static-libgcc", "-static-libstdc++", {force = true})
-    
+
     end
 
-    
+
 
 xpack("openvoice pack")
     set_formats("nsis", "zip", "targz")
@@ -66,5 +66,3 @@ xpack("openvoice pack")
     set_homepage("https://github.com/samehhhhhhhh/openvoice")
     set_author("Samehh.")
     add_targets("openvoice")
-
-    

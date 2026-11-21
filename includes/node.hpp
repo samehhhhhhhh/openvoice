@@ -24,9 +24,13 @@ struct pin
 /* A connection between an output pin of one node and an input pin of another one. */
 struct link
 {
-    unsigned int ID = 0;
-    unsigned int output_pin_ID = 0; // The pin the audio comes from
-    unsigned int input_pin_ID = 0;  // The pin the audio goes into
+    unsigned int input_node_index = 0;
+    unsigned int output_node_index = 0; // The pin the audio comes from
+    unsigned int input_pin_index = 0; // The pin the audio comes from
+    unsigned int output_pin_index = 0;  // The pin the audio goes into
+    unsigned int ID;
+    unsigned int output_pin_ID;
+    unsigned int input_pin_ID;
 };
 
 enum class widget_types
@@ -49,6 +53,7 @@ struct node_config
     std::string description;
     std::string color;
     std::vector<pin> pins;
+    std::vector<float> parameters;
 
     std::vector<node_widget> widgets;
 

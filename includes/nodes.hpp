@@ -59,8 +59,8 @@ struct endpoint_node : public node
 {
     endpoint_node(ma_node_graph &g_nodeGraph)
     {
-        config.title = "Endpoint node";
-        config.description = "Endpoint node";
+        config.title = "Output node";
+        config.description = "Your headset... Output or whatever";
 
         config.add_pin("Input", "This audio will get sent to the output device.", pin_types::INPUT, 0, id_generator::get_id());
 
@@ -96,7 +96,7 @@ struct waveform_node : public node
     waveform_node(ma_node_graph &g_nodeGraph)
     {
 
-        config.title = "Waveform node";
+        config.title = "WaveForm node";
         config.description = "A waveform node";
         config.widgets.push_back(frequency);
 
@@ -140,7 +140,7 @@ struct exciter_node : public node
     exciter_node(ma_node_graph &g_nodeGraph)
     {
 
-        config.title = "Excite node";
+        config.title = "Input node";
         config.description = "Litteraly your microphone";
 
         config.add_pin("Output", "An output brah", pin_types::OUTPUT, 0, id_generator::get_id());
@@ -212,6 +212,7 @@ struct lpf_node : public node
 
 };
 
+// AI, why ?
 enum class basic_operation
 {
     GAIN,
@@ -596,6 +597,8 @@ struct parametric_eq_node : public node
         check_result("Failed to update parametric EQ");
     }
 };
+
+// Will try to get help as soon as possible to finish these
 
 struct resonant_filter_node : public pending_dsp_node
 {

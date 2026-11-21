@@ -1,5 +1,8 @@
 
 #include "app.hpp"
+#include <imgui.h>
+
+
 
 App::App() {
 
@@ -101,29 +104,67 @@ void App::renderHomePage() {
 
         devices.update_devices();
         for(int i = 0; i < devices.captureDeviceCount; i++) {
-            
+
             if(ImGui::Selectable(devices.pCaptureDeviceInfos[i].name)) {
-                audio_engine.set_dev(&devices.pCaptureDeviceInfos[i].id, DEVICE_CAPTURE);   
+                audio_engine.set_dev(&devices.pCaptureDeviceInfos[i].id, DEVICE_CAPTURE);
             }
         }
         ImGui::EndPopup();
     }
+
+
     if(ImGui::BeginPopup("output_select")) {
         ImGui::SeparatorText("Devices : ");
         devices.update_devices();
         for(int i = 0; i < devices.playbackDeviceCount; i++) {
             if(ImGui::Selectable(devices.pPlaybackDeviceInfos[i].name)) {
-                audio_engine.set_dev(&devices.pPlaybackDeviceInfos[i].id, DEVICE_PLAYBACK);    
+                audio_engine.set_dev(&devices.pPlaybackDeviceInfos[i].id, DEVICE_PLAYBACK);
             }
-            
+
         }
         ImGui::EndPopup();
+
+    }
+
+    ImGui::BeginChild("Voices",ImVec2(ImGui::GetContentRegionAvail().x * 0.5f, 260), ImGuiChildFlags_Borders);
+
+    path voices_dir = "voices";
+
+    if(!exists(voices_dir)) {
+        create_directory(voices_dir);
+    }
+
+    for(const auto& i : directory_iterator(voices_dir)) {
+        if(i.path().extension() == ".conf" ) {
+
+            std::string token;
+            std::vector<std::string> file_content;
+
+            std::ifstream file(i.path());
+
+            for(int a = 0; a <=2; a++) {
+                std::getline(file, token);
+                file_content.push_back(token);
+            }
+
+            ImGui::BeginChild(file_content[1].c_str(), ImVec2(ImGui::GetContentRegionAvail().x * 0.2f, 200), ImGuiChildFlags_Borders);
+
+            ImGui::Text(file_content[1].c_str());
+
+            std::string authour_label = "Made by " + file_content[2];
+            ImGui::Text(authour_label.c_str());
+
+            if(ImGui::Button("Load")) {
+                save_manager::load(i.path(), audio_engine.nodeGraph);
+            }
+
+            ImGui::EndChild();
+
+        }
     }
 
 
-
-    // Display all locally saved voice files.
-    // Make a card for every sound.
+    ImGui::EndChild();
 
     ImGui::End();
 

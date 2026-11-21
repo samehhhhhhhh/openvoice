@@ -1,26 +1,17 @@
 
 #include "node_graph.hpp"
 
-void node_graph::add_node(node_descriptor target_node)
+std::shared_ptr<node> node_graph::add_node(node_descriptor target_node)
 {
-    for (auto& i : active_nodes)
-    {
-        // Is free
-        if (i == nullptr)
-        {
-            i = target_node.create(m_nodeGraph);
-            i->ID = id_generator::get_id();
-            break;
-        }
+    std::shared_ptr<node> created_node = target_node.create(m_nodeGraph);
 
-        if (i == active_nodes.back())
-        {
-            std::cout << "Array is full. \n";
-        }
-    }
+    active_nodes.push_back(created_node);
+    active_nodes[active_nodes.size() - 1]->ID = id_generator::get_id();
+
+    return created_node;
 }
 
-void node_graph::remove_node(std::unique_ptr<node> target_node)
+void node_graph::remove_node(std::shared_ptr<node> target_node)
 {
     for (auto& i : active_nodes)
     {
@@ -34,7 +25,7 @@ void node_graph::remove_node(std::unique_ptr<node> target_node)
                 {
                     const unsigned int link_ID = it.ID;
                     remove_link(link_ID);
-                    
+
                 }
             }
 
@@ -48,7 +39,7 @@ void node_graph::remove_node(std::unique_ptr<node> target_node)
     }
 }
 
-node* node_graph::find_node_by_pin(unsigned int pin_ID) 
+node* node_graph::find_node_by_pin(unsigned int pin_ID)
 {
     for (const auto& i : active_nodes)
     {
@@ -115,9 +106,31 @@ unsigned int node_graph::add_link(const unsigned int pin_a_ID, const unsigned in
 
     source_node->AttachTo(output_pin->index, *target_node, input_pin->index);
 
-    const link new_link {.ID = id_generator::get_id(),
-                         .output_pin_ID = output_pin->ID,
-                         .input_pin_ID = input_pin->ID};
+    auto source_node_iterator = std::find_if(
+        active_nodes.begin(),
+        active_nodes.end(),
+        [source_node](std::shared_ptr<node>& ptr) {
+            return ptr.get() == source_node;
+        });
+
+    int source_node_index = std::distance(active_nodes.begin(), source_node_iterator);
+
+    auto target_node_iterator = std::find_if(
+        active_nodes.begin(),
+        active_nodes.end(),
+        [target_node](std::shared_ptr<node>& ptr) {
+            return ptr.get() == target_node;
+        });
+
+    int target_node_index = std::distance(active_nodes.begin(), target_node_iterator);
+
+    const link new_link {.input_node_index = source_node_index,
+                        .output_node_index = target_node_index,
+                        .input_pin_index = input_pin->index,
+                        .output_pin_index = output_pin->index,
+                        .ID = id_generator::get_id(),
+                        .output_pin_ID = output_pin->ID,
+                        .input_pin_ID = input_pin->ID};
 
     links.push_back(new_link);
 
