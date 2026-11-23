@@ -181,7 +181,7 @@ void App::renderNodeEditor() {
     }
 
     n_manager.OnFrame(60, audio_engine.nodeGraph);
-    // Use the node_editor_manager class here
+    // Use the editor class here
 
     ImGui::End();
 

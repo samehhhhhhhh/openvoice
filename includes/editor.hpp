@@ -2,8 +2,8 @@
 // Created by samehh on 11‏/8‏/2026.
 //
 
-#ifndef OPENVOICE_NODE_EDITOR_MANAGER_HPP
-#define OPENVOICE_NODE_EDITOR_MANAGER_HPP
+#ifndef OPENVOICE_EDITOR_HPP
+#define OPENVOICE_EDITOR_HPP
 
 
 #include <imgui_node_editor.h>
@@ -46,4 +46,4 @@ public:
 };
 
 
-#endif //OPENVOICE_NODE_EDITOR_MANAGER_HPP
+#endif //OPENVOICE_EDITOR_HPP

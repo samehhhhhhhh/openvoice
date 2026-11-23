@@ -9,7 +9,7 @@
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlrenderer3.h>
 #include <filesystem>
-#include "node_editor_manager.hpp"
+#include "editor.hpp"
 #include <string>
 #include <fstream>
 #include "saves.hpp"

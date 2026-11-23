@@ -2,7 +2,7 @@
 // Created by samehh on 11‏/8‏/2026.
 //
 
-#include "node_editor_manager.hpp"
+#include "editor.hpp"
 #include "saves.hpp"
 #include <imgui_stdlib.h>
 void node_editor_man::OnFrame(float deltaTime, node_graph& ng) {
@@ -10,9 +10,11 @@ void node_editor_man::OnFrame(float deltaTime, node_graph& ng) {
 
     ImGui::Text("FPS: %.2f (%.2gms)", io.Framerate, io.Framerate ? 1000.0f / io.Framerate : 0.0f);
 
-    if (ImGui::Button("Create node"))
-        ImGui::OpenPopup("nodes");
     node* selected_node = nullptr;
+
+    if(ImGui::Shortcut(ImGuiMod_Shift | ImGuiKey_A)) {
+        ImGui::OpenPopup("nodes");
+    }
     if(ImGui::BeginPopup("nodes"))
     {
 
@@ -26,6 +28,7 @@ void node_editor_man::OnFrame(float deltaTime, node_graph& ng) {
         ImGui::EndPopup();
 
     }
+
 
     if(ImGui::Button("Recompile Nodes")) {
         ng.recompile_nodes();
